@@ -20,7 +20,7 @@ mapping(address => uint256) public participantMask;
  * @param _tokensPerBlock The amount of token that will be released per block, entered in wei format (E.g. 1000000000000000000)
  * @param _blockFreezeInterval The amount of blocks that need to pass (E.g. 1, 10, 100) before more tokens are brought into the ecosystem.
  */
- constructor(uint256 _tokensPerBlock, uint256 _blockFreezeInterval) public ERC20Detailed("Simple Token", "SIM", 18){ 
+ constructor(uint256 _tokensPerBlock, uint256 _blockFreezeInterval) public ERC20Detailed("Pearl", "PRL", 18){ 
 lastMintedBlockNumber = block.number;
 tokensPerBlock = _tokensPerBlock;
 blockFreezeInterval = _blockFreezeInterval;
