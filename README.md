@@ -14,11 +14,7 @@ Anybody after opening an account can post reviews and any review can be rewarded
 Pearl is a digital token, based on EIP 1973 standard. Everyday, an specific number of Pearls will be minted and added to the "Reward Pool". Pearls from this pool will be distributed amongst posts, based on reviewrs Revpower, Fama, Fort and the number of downvotes or upvotes and reputation of voters.
 Pearls can be used in participating businesses toward future purchases. It can be transferred to other users as well. The value of that depend of the market at any given time.
 
-# Now, what is Revpower?
-Revpower is the unit of influence in Perligo. All users start with a small amount of Revpower upon opening an account but they can increase it by exchanging Pearl for Revpower. Users with higher Revpowers earn more by posting reviews or voting.
-Revpower can be lent to other users, but those users cannot convert it to Pearl.
-
-# ...and What is Fama?
+# Now, What is Fama?
 Fama is the measure of reputation in Perligo. Every user has a Fama guage, much like life guage in video games. Upvotes on one's post increases the Fama but downvotes do the apposite. Only downvotes of users with higher Fama has negative effect.
 People often read reviews of or follow  reviewers with higher Fama because they know they are spending their time on good quality content.
 Difference between Fama and Revpower? Revpower is buyable, but Fama is not.
@@ -32,4 +28,4 @@ Here comes Voting Fort. It is like fuel for voting engine.Every vote burns some 
 Voting Fort replenishes every day.
 
 # Now after all of this, how much do I earn from my review?
-This greatly depend on your Revpower, Fort and Fama. Also it depends on number of upvotes and comments you get and from who you get them. Overall activity in the community  has a significant affect on your reward too since you get your reward from the reward pool.
+This greatly depend on your Fort and Fama. Also it depends on number of upvotes and comments you get and from who you get them. Overall activity in the community has a significant affect on your reward too since you get your reward from the reward pool.
