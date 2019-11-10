@@ -4,10 +4,8 @@ import "./Eip1973.sol";
 
 contract Rewards is Eip1973 {
 
-      uint256 public tokensPerBlock; 
-      uint256 public blockFreezeInterval; 
 
-      constructor() Eip1973(tokensPerBlock , blockFreezeInterval){}
+      constructor(){}
 
       /**
       * @dev Function to add users to the economy. 
@@ -45,11 +43,4 @@ contract Rewards is Eip1973 {
 
       }
 
-      function updateTokensPerBlock() private returns (bool){
-
-      }
-
-      function updateBlockFreezeInterval() private returns (bool){
-
-      }
 }

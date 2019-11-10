@@ -13,6 +13,9 @@ uint256 public totalParticipants = 0;
 uint256 public tokensPerBlock;
 uint256 public blockFreezeInterval;
 address public tokencontractAddress = address(this);
+string public tokenName;
+string public tokenSign;
+uint8  public tokenDecimal;
 mapping(address => uint256) public participantMask;
 
 /**
@@ -20,10 +23,14 @@ mapping(address => uint256) public participantMask;
  * @param _tokensPerBlock The amount of token that will be released per block, entered in wei format (E.g. 1000000000000000000)
  * @param _blockFreezeInterval The amount of blocks that need to pass (E.g. 1, 10, 100) before more tokens are brought into the ecosystem.
  */
-constructor(uint256 _tokensPerBlock, uint256 _blockFreezeInterval) public ERC20Detailed("Pearl", "PRL", 18){
+constructor(uint256 _tokensPerBlock, uint256 _blockFreezeInterval, string _tokenName, string _tokenSign, uint8 _tokenDecimal ) public
+ERC20Detailed(tokenName, tokenSign, tokenDecimal){
 lastMintedBlockNumber = block.number;
 tokensPerBlock = _tokensPerBlock;
 blockFreezeInterval = _blockFreezeInterval;
+tokenName = _tokenName;
+tokenSign = _tokenSign;
+tokenDecimal = _tokenDecimal;
 }
 
 /**
