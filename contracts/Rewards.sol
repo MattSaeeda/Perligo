@@ -13,7 +13,8 @@ contract Rewards is Eip1973 {
       * @return A boolean that indicates if the operation was successful.
       */
       function addUser(address _user) public returns (bool){
-
+            Eip1973.addMinters(_user);
+            return true;
       }
 
       /**
@@ -22,6 +23,8 @@ contract Rewards is Eip1973 {
       * @return A boolean that indicates if the operation was successful.
       */
       function removeUser(address _user) public returns (bool) {
+            Eip1973.removeMinters(_user);
+            return true;
       }
       
       /**
@@ -29,18 +32,19 @@ contract Rewards is Eip1973 {
       * @return A boolean that indicates if the operation was successful.
       */
       function mintTokensToPool() private returns (bool) {
+            Eip1973.mintTokens();
+            return true;
       }
 
-      function updateUserMask(address _user) private returns (bool){
-
+      function updateUserMask(address _user, uint256 _mask) private returns (bool){
+            Eip1973.participantsMask[_user] = _mask;
+            return true;
       }
 
-      function withdrawReward(address _user) private returns (bool){
-            
-      }
-
-      function showUserMask(address _user) public returns (bool){
-
+      function showUserMask(address _user) public returns (uint256){
+            uint256 userMask;
+            userMask = Eip1973.participantsMask[_user];
+            return userMaskg;
       }
 
 }
