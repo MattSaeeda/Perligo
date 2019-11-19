@@ -40,7 +40,7 @@ contract Perligo is Rewards {
             return true;
       }
 
-      function updateUserMask(address _user) private returns (bool){
+      function updateUserMask(address _user, uint _mask) private returns (bool){
             Rewards.participantsMask[_user] = _mask;
             return true;
 
@@ -49,7 +49,7 @@ contract Perligo is Rewards {
       function showUserMask(address _user) public returns (bool){
             uint256 userMask;
             userMask = Rewards.participantsMask[_user];
-            return userMaskg;
+            return userMask;
 
       }
 
