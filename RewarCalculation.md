@@ -19,10 +19,14 @@ User Post Score------------>UPScore +
 User Comment Score--------->UCScore
 User Vote Score------------>UVScore
                           ----------
-User Total Score----------->UTScore
+User Total Score----------->UTScore*
+
+*Every 24 hours(5760 blocks), all users' scores reset to zero.
 
 User1.UTScore + User2.UTscore + ....+Usern.UTscore = CUTScore ------------>Cumulative UTscore
 
 NumberOfPearlsInPool / UTScore = ScoreValueInPearl
 
 ScoreValueInPearl x User.UTScore = UserTotalRewardsInADay
+
+*Every 24 hours(5760 blocks), all users' scores reset to zero.

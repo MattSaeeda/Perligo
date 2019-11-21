@@ -1,0 +1,22 @@
+{
+  "name": "perligo",
+  "version": "1.0.0",
+  "description": "A dApp, to leave reviews and earn rewards",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MattSaeeda/Perligo.git"
+  },
+  "author": "Matt Saeeda",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MattSaeeda/Perligo/issues"
+  },
+  "homepage": "https://github.com/MattSaeeda/Perligo#readme"
+}

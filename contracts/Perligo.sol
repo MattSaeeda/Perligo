@@ -7,8 +7,24 @@ contract Perligo is Rewards {
       uint256 public tokensPerBlock;
       uint256 public blockFreezeInterval;
 
-      constructor() Rewards(tokensPerBlock , blockFreezeInterval) public ERC20Detailed
-      ("Pearl", "PRL", 18){}
+      struct Post {
+            string title;
+            string body;
+            Comment[] comments;
+            uint upVotes;
+            uint downVotes;
+            uint timePosted;
+      }
+
+      struct Comment {
+            string body;
+            uint upVotes;
+            uint downVotes;
+            uint timePosted;
+
+      }
+
+      constructor() Rewards(tokensPerBlock , blockFreezeInterval) public {}
 
       /**
       * @dev Function to add users to the economy.
