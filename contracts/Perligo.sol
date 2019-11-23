@@ -24,6 +24,13 @@ contract Perligo is Rewards {
 
       }
 
+      struct UserScores {
+            uint userPostScore;
+            uint userCommentScore;
+            uint userVoteScore;
+            uint userTotalScore;
+      }
+
       constructor() Rewards(tokensPerBlock , blockFreezeInterval) public {}
 
       /**
