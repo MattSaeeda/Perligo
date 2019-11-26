@@ -11,7 +11,7 @@ There is a grace period after posting a review for businesses to comment on it. 
 Anybody after opening an account can post reviews and any review can be rewarded by Pearl.
 
 # What is Pearl?
-Pearl is a digital token, based on EIP 1973 standard. Everyday, an specific number of Pearls will be minted and added to the "Reward Pool". Pearls from this pool will be distributed amongst posts, based on reviewrs Revpower, Fama, Fort and the number of downvotes or upvotes and reputation of voters.
+Pearl is a digital token, based on EIP 1973 standard. Everyday, a specific number of Pearls will be minted and added to the "Reward Pool". Pearls from this pool will be distributed amongst posts, based on reviewrs Revpower, Fama, Fort and the number of downvotes or upvotes and reputation of voters.
 Pearls can be used in participating businesses toward future purchases. It can be transferred to other users as well. The value of that depend of the market at any given time.
 
 # Now, What is Fama?

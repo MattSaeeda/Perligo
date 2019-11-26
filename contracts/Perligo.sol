@@ -4,74 +4,115 @@ import "./Rewards.sol";
 
 contract Perligo is Rewards {
 
-      uint256 public tokensPerBlock;
-      uint256 public blockFreezeInterval;
-
-      struct Post {
-            string title;
-            string body;
-            Comment[] comments;
-            uint upVotes;
-            uint downVotes;
-            uint timePosted;
+      
+      Rewards ourReward = new Rewards(1000000, 5600);
+      
+       struct Scores {
+            uint postScore;
+            uint commentScore;
+            uint voteScore;
+            uint totalScore;
+            int userFama;
       }
 
-      struct Comment {
-            string body;
-            uint upVotes;
-            uint downVotes;
-            uint timePosted;
 
+      mapping(address => Scores) userScores;
+      
+      address[] reviewers;
+      
+      function updateUserPostScore(address _user , uint _postScore) public returns (bool){
+          userScores[_user].postScore += _postScore;
+          return true;
       }
-
-      struct UserScores {
-            uint userPostScore;
-            uint userCommentScore;
-            uint userVoteScore;
-            uint userTotalScore;
+      
+      function updateUserCommentScore(address _user , uint _timeReviewPosted) public returns(bool){
+          require(userScores[_user].userFama > 0 && userScores[_user].userFama < 21);
+          uint timePassed = now - _timeReviewPosted;
+          userScores[_user].userFama -= 1;
+          if(timePassed <= 10800)
+            userScores[_user].commentScore += 24; else 
+          if(timePassed > 10800 && timePassed <= 32400)
+            userScores[_user].commentScore += 15; else
+          if(timePassed > 32400 && timePassed <= 64800)
+            userScores[_user].commentScore += 9; else
+          if(timePassed > 64800 && timePassed <= 86400)
+            userScores[_user].commentScore += 6; else
+          userScores[_user].commentScore += 3;
+          userScores[_user].userFama -= 1;
       }
-
-      constructor() Rewards(tokensPerBlock , blockFreezeInterval) public {}
-
-      /**
-      * @dev Function to add users to the economy.
-      * @param _user The address that will be able to mint tokens.
-      * @return A boolean that indicates if the operation was successful.
-      */
+      
+      function updateUserVoteScore(address _user , uint _timeReviewPosted) public{
+          require(userScores[_user].userFama > 0 && userScores[_user].userFama < 21);
+          uint timePassed = now - _timeReviewPosted;
+          userScores[_user].userFama -= 1;
+          if(timePassed <= 10800)
+            userScores[_user].commentScore += 8; else 
+          if(timePassed > 10800 && timePassed <= 32400)
+            userScores[_user].commentScore += 5; else
+          if(timePassed > 32400 && timePassed <= 64800)
+            userScores[_user].commentScore += 3; else
+          if(timePassed > 64800 && timePassed <= 86400)
+            userScores[_user].commentScore += 2; else
+          userScores[_user].commentScore += 1;
+          
+      }
+      
+      function resetUserAndFamaScores() private returns(bool){
+          for (uint i=0; i< totalParticipants ; i++){
+            userScores[reviewers[i]].commentScore = 0;
+            userScores[reviewers[i]].voteScore = 0;
+            userScores[reviewers[i]].postScore = 0;
+            userScores[reviewers[i]].userFama = 20;
+            }
+          
+      }
+      
+      function updateUsersMask() private returns(bool){
+          uint sumOfAllScores;
+          for (uint i=0; i< totalParticipants ; i++){
+              userScores[reviewers[i]].totalScore = userScores[reviewers[i]].postScore + userScores[reviewers[i]].commentScore +
+              userScores[reviewers[i]].voteScore;
+              sumOfAllScores = sumOfAllScores + userScores[reviewers[i]].totalScore;
+          }
+          uint pearlstoEachScore = 1000000 / sumOfAllScores;
+          
+          for (uint i=0 ; i<totalParticipants ; i++){
+              participantMask[reviewers[i]] = participantMask[reviewers[i]] +userScores[reviewers[i]].totalScore * pearlstoEachScore;
+          }
+      }
+          
       function addUser(address _user) public returns (bool){
-            Rewards.addMinters(_user);
+            ourReward.addMinters(_user);
+            reviewers.push(_user);
             return true;
 
       }
+      
+      function showRoundMask() public view returns (uint){
+          return roundMask;
+      }
 
-      /**
-      * @dev Function to remove users from the economy.
-       * @param _user The address that will be unable to mint tokens.
-      * @return A boolean that indicates if the operation was successful.
-      */
+
       function removeUser(address _user) public returns (bool) {
-            Rewards.removeMinters(_user);
+            ourReward.removeMinters(_user);
             return true;
       }
       
-      /**
-      * @dev Function to mint new tokens into the economy.
-      * @return A boolean that indicates if the operation was successful.
-      */
+
       function mintTokensToPool() private returns (bool) {
-            Rewards.mintTokens();
+            ourReward.trigger();
             return true;
       }
 
       function updateUserMask(address _user, uint _mask) private returns (bool){
-            Rewards.participantsMask[_user] = _mask;
+            participantMask[_user] = _mask;
             return true;
 
       }
 
-      function showUserMask(address _user) public returns (bool){
+      function showUserMask(address _user) public view returns (uint){
             uint256 userMask;
-            userMask = Rewards.participantsMask[_user];
+            userMask = participantMask[_user];
             return userMask;
 
       }
