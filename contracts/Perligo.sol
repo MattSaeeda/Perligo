@@ -12,7 +12,7 @@ contract Perligo is Rewards {
             uint commentScore;
             uint voteScore;
             uint totalScore;
-            int userFama;
+            uint userFama;
       }
 
 
