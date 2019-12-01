@@ -1,32 +1,32 @@
-Post Base Reward (Pr)--------->25
-Comment Base Reward(Cr) ------>3
-Vote Base Reward(Vr)---------->1
+Post Score --------->1
+Comment Score ------>3
+Vote Score --------->1
 
 Top---------->Time of Posting
 Toa---------->Time of Action
+- Score of posting always is the same, regardless of time/date of posting.
+- Scores of commenting/voting depends of time of posting of relevant review as follow:
+
+time(hrs)                    Post Score                      Vote Score 
+---------------------------------------------------------------------------
+Toa <= Top+3                   x 8                             x 8
+Top+3 <Toa <= Top+9            x 5                             x 5
+Top+9<Toa <= Top+18            x 3                             x 3
+Top+18<Toa <= Top+24           x 2                             x 2
+Top>24                         x 1                             x 1
 
 
-time(hrs)                    Comment Reward(Cr)            Vote Reward(Vr)        Blocks
-----------------------------------------------------------------------------------------------------
-Toa <= Top+3                   Cr x 8                      Vr x 8             Toa<= Top + 720
-Top+3 <Toa <= Top+9            Cr x 5                      Vr x 5             Top+720 <Toa<= Top+2160
-Top+9<Toa <= Top+18            Cr x 3                      Vr x 3             Top+2160 <Toa<= To+4320
-Top+18<Toa <= Top+24           Cr x 2                      Vr x 2             Top+4320 <Toa<= To+5760
-Top>24                         Cr                          Vr                 Toa > Top+5760
+User Post Score    +
+User Comment Score
+User Vote Score
+------------------
+Total Score*
 
 
-User Post Score------------>UPScore +
-User Comment Score--------->UCScore
-User Vote Score------------>UVScore
-                          ----------
-User Total Score----------->UTScore*
+User1.UTScore + User2.UTscore + ....+Usern.UTscore = sumOfAllScores
 
-*Every 24 hours(5760 blocks), all users' scores reset to zero.
+NumberOfPearlsInPool / sumOfAllScores = pearlsToEachScore
 
-User1.UTScore + User2.UTscore + ....+Usern.UTscore = CUTScore ------------>Cumulative UTscore
-
-NumberOfPearlsInPool / UTScore = ScoreValueInPearl
-
-ScoreValueInPearl x User.UTScore = UserTotalRewardsInADay
+ScoreValueInPearl x userTotalScore = UserTotalRewardsInADay
 
 *Every 24 hours(5760 blocks), all users' scores reset to zero.

@@ -74,10 +74,10 @@ contract Perligo is Rewards {
               userScores[reviewers[i]].voteScore;
               sumOfAllScores = sumOfAllScores + userScores[reviewers[i]].totalScore;
           }
-          uint pearlstoEachScore = 1000000 / sumOfAllScores;
+          uint pearlsToEachScore = 1000000 / sumOfAllScores;
           
           for (uint i=0 ; i<totalParticipants ; i++){
-              participantMask[reviewers[i]] = participantMask[reviewers[i]] +userScores[reviewers[i]].totalScore * pearlstoEachScore;
+              participantMask[reviewers[i]] = participantMask[reviewers[i]] +userScores[reviewers[i]].totalScore * pearlsToEachScore;
           }
       }
           
