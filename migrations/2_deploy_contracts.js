@@ -1,5 +1,5 @@
-var Perligo = artifacts.require("Perligo");
+var SimpleStorage = artifacts.require("./SimpleStorage.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(Perligo);
+  deployer.deploy(SimpleStorage);
 };
