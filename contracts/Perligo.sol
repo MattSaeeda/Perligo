@@ -7,6 +7,14 @@ contract Perligo is Rewards {
       
       Rewards ourReward = new Rewards(1000000, 5600);
       
+      address public owner;
+
+      
+      modifier onlyOwner {
+        require(msg.sender == owner);
+        _;
+      }
+      
        struct Scores {
             uint postScore;
             uint commentScore;
@@ -14,12 +22,13 @@ contract Perligo is Rewards {
             uint totalScore;
             uint userFama;
       }
+      
 
 
       mapping(address => Scores) userScores;
       
       address[] reviewers;
-      
+
       function updateUserPostScore(address _user , uint _postScore) public returns (bool){
           userScores[_user].postScore += _postScore;
           return true;
@@ -42,7 +51,7 @@ contract Perligo is Rewards {
       }
       
       function updateUserVoteScore(address _user , uint _timeReviewPosted) public{
-          require(userScores[_user].userFama > 0 && userScores[_user].userFama < 21);
+          require(userScores[_user].userFama > 0 && userScores[_user].userFama <= 20);
           uint timePassed = now - _timeReviewPosted;
           userScores[_user].userFama -= 1;
           if(timePassed <= 10800)
@@ -57,7 +66,7 @@ contract Perligo is Rewards {
           
       }
       
-      function resetUserAndFamaScores() private returns(bool){
+      function resetUserAndFamaScores() onlyOwner private returns(bool){
           for (uint i=0; i< totalParticipants ; i++){
             userScores[reviewers[i]].commentScore = 0;
             userScores[reviewers[i]].voteScore = 0;
@@ -74,14 +83,14 @@ contract Perligo is Rewards {
               userScores[reviewers[i]].voteScore;
               sumOfAllScores = sumOfAllScores + userScores[reviewers[i]].totalScore;
           }
-          uint pearlsToEachScore = 1000000 / sumOfAllScores;
+          uint pearlstoEachScore = 1000000 / sumOfAllScores;
           
           for (uint i=0 ; i<totalParticipants ; i++){
-              participantMask[reviewers[i]] = participantMask[reviewers[i]] +userScores[reviewers[i]].totalScore * pearlsToEachScore;
+              participantMask[reviewers[i]] = participantMask[reviewers[i]] +userScores[reviewers[i]].totalScore * pearlstoEachScore;
           }
       }
           
-      function addUser(address _user) public returns (bool){
+      function addUser(address _user) onlyOwner public returns (bool){
             ourReward.addMinters(_user);
             reviewers.push(_user);
             return true;
@@ -93,21 +102,26 @@ contract Perligo is Rewards {
       }
 
 
-      function removeUser(address _user) public returns (bool) {
-            ourReward.removeMinters(_user);
-            return true;
+      function removeUser(address _user) onlyOwner public returns (bool) {
+        ourReward.removeMinters(_user);
+        return true;
       }
       
-
-      function mintTokensToPool() private returns (bool) {
+      /**
+      * @dev Function to mint new tokens into the economy.
+      * @return A boolean that indicates if the operation was successful.
+      */
+      function mintTokensToPool() onlyOwner private returns (bool) {
             ourReward.trigger();
             return true;
       }
+      
+      function showUserPostingScores(address _user) public view returns (uint){
+          
+      }
 
-      function updateUserMask(address _user, uint _mask) private returns (bool){
-            participantMask[_user] = _mask;
-            return true;
-
+      function showUserFama(address _user) public view returns (uint){
+          return userScores[_user].userFama;
       }
 
       function showUserMask(address _user) public view returns (uint){
@@ -116,5 +130,6 @@ contract Perligo is Rewards {
             return userMask;
 
       }
+      
 
 }

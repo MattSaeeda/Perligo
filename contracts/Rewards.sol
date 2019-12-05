@@ -1,7 +1,7 @@
-pragma solidity ^0.5.2;
+pragma solidity ^0.5.0;
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC20/ERC20Mintable.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC20/ERC20Detailed.sol";
+import "../client/node_modules/@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
+import "../client/node_modules/@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 
 contract Rewards is ERC20Mintable, ERC20Detailed {
 

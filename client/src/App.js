@@ -1,8 +1,10 @@
 import React, { Component } from "react";
-
+import Footer from "../src/components/Footer.js";
+import Header from "../src/components/Header.js"
 import getWeb3 from "./getWeb3";
 
 import "./App.css";
+
 
 class App extends Component {
   //state = { storageValue: 0, web3: null, accounts: null, contract: null };
@@ -54,9 +56,10 @@ class App extends Component {
     // }
     return (
       <div className="App">
-        <h1>Perligo</h1>
+        {/* <h1>Perligo</h1>
         <p>An app to post reviews on any services and businesses and eran cryptocurrency</p>
-        <h2>Example</h2>
+        <h2>Example</h2> */}
+        <Header/>
         <p>
           {/* If your contracts compiled and migrated successfully, below will show
           a stored value of 5 (by default). */}
@@ -65,6 +68,8 @@ class App extends Component {
           Try changing the value stored on <strong>line 40</strong> of App.js.
         </p> */}
         {/* <div>The stored value is: {this.state.storageValue}</div> */}
+
+        <Footer />
       </div>
     );
   }
