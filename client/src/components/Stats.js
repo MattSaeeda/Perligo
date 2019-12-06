@@ -14,7 +14,7 @@ class Stats extends Component {
                               <h5>Voting Score:  <Badge color="primary">45</Badge></h5>
                               <h5>You spent <Badge color="primary">12</Badge> Fama points.</h5>
                               <h5>You have <Badge color="primary">8</Badge> Fama points remaining.</h5>
-                              <h5>You earned <Badge color="primary">25</Badge> Pearl coins yesterday</h5>
+                              <h5>You earned <Badge color="primary">25</Badge> Pearl coins yesterday.</h5>
                       </CardBody>
                 </Card>
 

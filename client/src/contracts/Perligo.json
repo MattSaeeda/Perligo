@@ -672,7 +672,7 @@
           "type": "address"
         }
       ],
-      "name": "showUserPostingScores",
+      "name": "showUserPostScore",
       "outputs": [
         {
           "name": "",
@@ -691,7 +691,45 @@
           "type": "address"
         }
       ],
-      "name": "showUserFama",
+      "name": "showUserCommentScore",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_user",
+          "type": "address"
+        }
+      ],
+      "name": "showUserVoteScore",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_user",
+          "type": "address"
+        }
+      ],
+      "name": "showUserTotalScore",
       "outputs": [
         {
           "name": "",
@@ -726,16 +764,16 @@
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity >=0.5.0;\n\nimport \"./Rewards.sol\";\n\ncontract Perligo is Rewards {\n\n      \n      Rewards ourReward = new Rewards(1000000, 5600);\n      \n      address public owner;\n\n      \n      modifier onlyOwner {\n        require(msg.sender == owner);\n        _;\n      }\n      \n       struct Scores {\n            uint postScore;\n            uint commentScore;\n            uint voteScore;\n            uint totalScore;\n            uint userFama;\n      }\n      \n\n\n      mapping(address => Scores) userScores;\n      \n      address[] reviewers;\n\n      function updateUserPostScore(address _user , uint _postScore) public returns (bool){\n          userScores[_user].postScore += _postScore;\n          return true;\n      }\n      \n      function updateUserCommentScore(address _user , uint _timeReviewPosted) public returns(bool){\n          require(userScores[_user].userFama > 0 && userScores[_user].userFama < 21);\n          uint timePassed = now - _timeReviewPosted;\n          userScores[_user].userFama -= 1;\n          if(timePassed <= 10800)\n            userScores[_user].commentScore += 24; else \n          if(timePassed > 10800 && timePassed <= 32400)\n            userScores[_user].commentScore += 15; else\n          if(timePassed > 32400 && timePassed <= 64800)\n            userScores[_user].commentScore += 9; else\n          if(timePassed > 64800 && timePassed <= 86400)\n            userScores[_user].commentScore += 6; else\n          userScores[_user].commentScore += 3;\n          userScores[_user].userFama -= 1;\n      }\n      \n      function updateUserVoteScore(address _user , uint _timeReviewPosted) public{\n          require(userScores[_user].userFama > 0 && userScores[_user].userFama <= 20);\n          uint timePassed = now - _timeReviewPosted;\n          userScores[_user].userFama -= 1;\n          if(timePassed <= 10800)\n            userScores[_user].commentScore += 8; else \n          if(timePassed > 10800 && timePassed <= 32400)\n            userScores[_user].commentScore += 5; else\n          if(timePassed > 32400 && timePassed <= 64800)\n            userScores[_user].commentScore += 3; else\n          if(timePassed > 64800 && timePassed <= 86400)\n            userScores[_user].commentScore += 2; else\n          userScores[_user].commentScore += 1;\n          \n      }\n      \n      function resetUserAndFamaScores() onlyOwner private returns(bool){\n          for (uint i=0; i< totalParticipants ; i++){\n            userScores[reviewers[i]].commentScore = 0;\n            userScores[reviewers[i]].voteScore = 0;\n            userScores[reviewers[i]].postScore = 0;\n            userScores[reviewers[i]].userFama = 20;\n            }\n          \n      }\n      \n      function updateUsersMask() private returns(bool){\n          uint sumOfAllScores;\n          for (uint i=0; i< totalParticipants ; i++){\n              userScores[reviewers[i]].totalScore = userScores[reviewers[i]].postScore + userScores[reviewers[i]].commentScore +\n              userScores[reviewers[i]].voteScore;\n              sumOfAllScores = sumOfAllScores + userScores[reviewers[i]].totalScore;\n          }\n          uint pearlstoEachScore = 1000000 / sumOfAllScores;\n          \n          for (uint i=0 ; i<totalParticipants ; i++){\n              participantMask[reviewers[i]] = participantMask[reviewers[i]] +userScores[reviewers[i]].totalScore * pearlstoEachScore;\n          }\n      }\n          \n      function addUser(address _user) onlyOwner public returns (bool){\n            ourReward.addMinters(_user);\n            reviewers.push(_user);\n            return true;\n\n      }\n      \n      function showRoundMask() public view returns (uint){\n          return roundMask;\n      }\n\n\n      function removeUser(address _user) onlyOwner public returns (bool) {\n        ourReward.removeMinters(_user);\n        return true;\n      }\n      \n      /**\n      * @dev Function to mint new tokens into the economy.\n      * @return A boolean that indicates if the operation was successful.\n      */\n      function mintTokensToPool() onlyOwner private returns (bool) {\n            ourReward.trigger();\n            return true;\n      }\n      \n      function showUserPostingScores(address _user) public view returns (uint){\n          \n      }\n\n      function showUserFama(address _user) public view returns (uint){\n          return userScores[_user].userFama;\n      }\n\n      function showUserMask(address _user) public view returns (uint){\n            uint256 userMask;\n            userMask = participantMask[_user];\n            return userMask;\n\n      }\n      \n\n}",
+  "source": "pragma solidity >=0.5.0;\n\nimport \"./Rewards.sol\";\n\ncontract Perligo is Rewards {\n\n      \n      Rewards ourReward = new Rewards(1000000, 5600);\n      \n      address public owner;\n\n      \n      modifier onlyOwner {\n        require(msg.sender == owner);\n        _;\n      }\n      \n       struct Scores {\n            uint postScore;\n            uint commentScore;\n            uint voteScore;\n            uint totalScore;\n            uint userFama;\n      }\n      \n\n\n      mapping(address => Scores) userScores;\n      \n      address[] reviewers;\n\n      function updateUserPostScore(address _user , uint _postScore) public returns (bool){\n          userScores[_user].postScore += _postScore;\n          return true;\n      }\n      \n      function updateUserCommentScore(address _user , uint _timeReviewPosted) public returns(bool){\n          require(userScores[_user].userFama > 0 && userScores[_user].userFama < 21);\n          uint timePassed = now - _timeReviewPosted;\n          userScores[_user].userFama -= 1;\n          if(timePassed <= 10800)\n            userScores[_user].commentScore += 24; else \n          if(timePassed > 10800 && timePassed <= 32400)\n            userScores[_user].commentScore += 15; else\n          if(timePassed > 32400 && timePassed <= 64800)\n            userScores[_user].commentScore += 9; else\n          if(timePassed > 64800 && timePassed <= 86400)\n            userScores[_user].commentScore += 6; else\n          userScores[_user].commentScore += 3;\n          userScores[_user].userFama -= 1;\n      }\n      \n      function updateUserVoteScore(address _user , uint _timeReviewPosted) public{\n          require(userScores[_user].userFama > 0 && userScores[_user].userFama <= 20);\n          uint timePassed = now - _timeReviewPosted;\n          userScores[_user].userFama -= 1;\n          if(timePassed <= 10800)\n            userScores[_user].commentScore += 8; else \n          if(timePassed > 10800 && timePassed <= 32400)\n            userScores[_user].commentScore += 5; else\n          if(timePassed > 32400 && timePassed <= 64800)\n            userScores[_user].commentScore += 3; else\n          if(timePassed > 64800 && timePassed <= 86400)\n            userScores[_user].commentScore += 2; else\n          userScores[_user].commentScore += 1;\n          \n      }\n      \n      function resetUserAndFamaScores() onlyOwner private returns(bool){\n          for (uint i=0; i< totalParticipants ; i++){\n            userScores[reviewers[i]].commentScore = 0;\n            userScores[reviewers[i]].voteScore = 0;\n            userScores[reviewers[i]].postScore = 0;\n            userScores[reviewers[i]].userFama = 20;\n            }\n          \n      }\n      \n      function updateUsersMask() private returns(bool){\n          uint sumOfAllScores;\n          for (uint i=0; i< totalParticipants ; i++){\n              userScores[reviewers[i]].totalScore = userScores[reviewers[i]].postScore + userScores[reviewers[i]].commentScore +\n              userScores[reviewers[i]].voteScore;\n              sumOfAllScores = sumOfAllScores + userScores[reviewers[i]].totalScore;\n          }\n          uint pearlstoEachScore = 1000000 / sumOfAllScores;\n          \n          for (uint i=0 ; i<totalParticipants ; i++){\n              participantMask[reviewers[i]] = participantMask[reviewers[i]] +userScores[reviewers[i]].totalScore * pearlstoEachScore;\n          }\n      }\n          \n      function addUser(address _user) onlyOwner public returns (bool){\n            ourReward.addMinters(_user);\n            reviewers.push(_user);\n            return true;\n\n      }\n      \n      function showRoundMask() public view returns (uint){\n          return roundMask;\n      }\n\n\n      function removeUser(address _user) onlyOwner public returns (bool) {\n        ourReward.removeMinters(_user);\n        return true;\n      }\n      \n      /**\n      * @dev Function to mint new tokens into the economy.\n      * @return A boolean that indicates if the operation was successful.\n      */\n      function mintTokensToPool() onlyOwner private returns (bool) {\n            ourReward.trigger();\n            return true;\n      }\n      \n      function showUserPostScore(address _user) public view returns (uint){\n          return userScores[_user].postScore;\n      }\n      \n      function showUserCommentScore(address _user) public view returns (uint){\n          return userScores[_user].commentScore;\n      }\n      \n      function showUserVoteScore(address _user) public view returns (uint){\n          return userScores[_user].voteScore;\n      }\n\n      function showUserTotalScore(address _user) public view returns (uint){\n          uint tScore = userScores[_user].postScore + userScores[_user].commentScore + userScores[_user].voteScore;\n          return tScore;\n      }\n\n\n      function showUserMask(address _user) public view returns (uint){\n            uint256 userMask;\n            userMask = participantMask[_user];\n            return userMask;\n\n      }\n      \n\n}",
   "sourcePath": "/home/matt/myproject/Perligo/contracts/Perligo.sol",
   "ast": {
     "absolutePath": "/home/matt/myproject/Perligo/contracts/Perligo.sol",
     "exportedSymbols": {
       "Perligo": [
-        1550
+        1595
       ]
     },
-    "id": 1551,
+    "id": 1596,
     "nodeType": "SourceUnit",
     "nodes": [
       {
@@ -754,8 +792,8 @@
         "file": "./Rewards.sol",
         "id": 1021,
         "nodeType": "ImportDirective",
-        "scope": 1551,
-        "sourceUnit": 1869,
+        "scope": 1596,
+        "sourceUnit": 1914,
         "src": "26:23:9",
         "symbolAliases": [],
         "unitAlias": ""
@@ -769,10 +807,10 @@
               "id": 1022,
               "name": "Rewards",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 1868,
+              "referencedDeclaration": 1913,
               "src": "71:7:9",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Rewards_$1868",
+                "typeIdentifier": "t_contract$_Rewards_$1913",
                 "typeString": "contract Rewards"
               }
             },
@@ -788,15 +826,15 @@
           864,
           892,
           961,
-          1868
+          1913
         ],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 1550,
+        "id": 1595,
         "linearizedBaseContracts": [
-          1550,
-          1868,
+          1595,
+          1913,
           864,
           892,
           214,
@@ -812,12 +850,12 @@
             "id": 1030,
             "name": "ourReward",
             "nodeType": "VariableDeclaration",
-            "scope": 1550,
+            "scope": 1595,
             "src": "95:46:9",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_Rewards_$1868",
+              "typeIdentifier": "t_contract$_Rewards_$1913",
               "typeString": "contract Rewards"
             },
             "typeName": {
@@ -825,10 +863,10 @@
               "id": 1024,
               "name": "Rewards",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 1868,
+              "referencedDeclaration": 1913,
               "src": "95:7:9",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Rewards_$1868",
+                "typeIdentifier": "t_contract$_Rewards_$1913",
                 "typeString": "contract Rewards"
               }
             },
@@ -891,7 +929,7 @@
                 "nodeType": "NewExpression",
                 "src": "115:11:9",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_function_creation_nonpayable$_t_uint256_$_t_uint256_$returns$_t_contract$_Rewards_$1868_$",
+                  "typeIdentifier": "t_function_creation_nonpayable$_t_uint256_$_t_uint256_$returns$_t_contract$_Rewards_$1913_$",
                   "typeString": "function (uint256,uint256) returns (contract Rewards)"
                 },
                 "typeName": {
@@ -899,10 +937,10 @@
                   "id": 1025,
                   "name": "Rewards",
                   "nodeType": "UserDefinedTypeName",
-                  "referencedDeclaration": 1868,
+                  "referencedDeclaration": 1913,
                   "src": "119:7:9",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_Rewards_$1868",
+                    "typeIdentifier": "t_contract$_Rewards_$1913",
                     "typeString": "contract Rewards"
                   }
                 }
@@ -917,7 +955,7 @@
               "nodeType": "FunctionCall",
               "src": "115:26:9",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Rewards_$1868",
+                "typeIdentifier": "t_contract$_Rewards_$1913",
                 "typeString": "contract Rewards"
               }
             },
@@ -928,7 +966,7 @@
             "id": 1032,
             "name": "owner",
             "nodeType": "VariableDeclaration",
-            "scope": 1550,
+            "scope": 1595,
             "src": "156:20:9",
             "stateVariable": true,
             "storageLocation": "default",
@@ -979,7 +1017,7 @@
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1883,
+                            "referencedDeclaration": 1928,
                             "src": "229:3:9",
                             "typeDescriptions": {
                               "typeIdentifier": "t_magic_message",
@@ -1033,10 +1071,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        1886,
-                        1887
+                        1931,
+                        1932
                       ],
-                      "referencedDeclaration": 1886,
+                      "referencedDeclaration": 1931,
                       "src": "221:7:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -1218,7 +1256,7 @@
             ],
             "name": "Scores",
             "nodeType": "StructDefinition",
-            "scope": 1550,
+            "scope": 1595,
             "src": "284:166:9",
             "visibility": "public"
           },
@@ -1227,7 +1265,7 @@
             "id": 1058,
             "name": "userScores",
             "nodeType": "VariableDeclaration",
-            "scope": 1550,
+            "scope": 1595,
             "src": "466:37:9",
             "stateVariable": true,
             "storageLocation": "default",
@@ -1274,7 +1312,7 @@
             "id": 1061,
             "name": "reviewers",
             "nodeType": "VariableDeclaration",
-            "scope": 1550,
+            "scope": 1595,
             "src": "518:19:9",
             "stateVariable": true,
             "storageLocation": "default",
@@ -1527,7 +1565,7 @@
               ],
               "src": "623:6:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "546:168:9",
             "stateMutability": "nonpayable",
             "superFunction": null,
@@ -1760,10 +1798,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        1886,
-                        1887
+                        1931,
+                        1932
                       ],
-                      "referencedDeclaration": 1886,
+                      "referencedDeclaration": 1931,
                       "src": "832:7:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -1838,7 +1876,7 @@
                       "name": "now",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1885,
+                      "referencedDeclaration": 1930,
                       "src": "936:3:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -3056,7 +3094,7 @@
               ],
               "src": "814:6:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "728:794:9",
             "stateMutability": "nonpayable",
             "superFunction": null,
@@ -3289,10 +3327,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        1886,
-                        1887
+                        1931,
+                        1932
                       ],
-                      "referencedDeclaration": 1886,
+                      "referencedDeclaration": 1931,
                       "src": "1623:7:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -3367,7 +3405,7 @@
                       "name": "now",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1885,
+                      "referencedDeclaration": 1930,
                       "src": "1728:3:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -4464,7 +4502,7 @@
               "parameters": [],
               "src": "1611:0:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "1536:744:9",
             "stateMutability": "nonpayable",
             "superFunction": null,
@@ -5000,7 +5038,7 @@
                       "name": "totalParticipants",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1568,
+                      "referencedDeclaration": 1613,
                       "src": "2389:17:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -5173,7 +5211,7 @@
               ],
               "src": "2353:6:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "2294:364:9",
             "stateMutability": "nonpayable",
             "superFunction": null,
@@ -5800,7 +5838,7 @@
                       "name": "totalParticipants",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1568,
+                      "referencedDeclaration": 1613,
                       "src": "2781:17:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -6013,7 +6051,7 @@
                               "name": "participantMask",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 1581,
+                              "referencedDeclaration": 1626,
                               "src": "3223:15:9",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
@@ -6093,7 +6131,7 @@
                                 "name": "participantMask",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 1581,
+                                "referencedDeclaration": 1626,
                                 "src": "3255:15:9",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
@@ -6319,7 +6357,7 @@
                       "name": "totalParticipants",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1568,
+                      "referencedDeclaration": 1613,
                       "src": "3183:17:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -6472,7 +6510,7 @@
               ],
               "src": "2714:6:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "2672:690:9",
             "stateMutability": "nonpayable",
             "superFunction": null,
@@ -6518,7 +6556,7 @@
                         "referencedDeclaration": 1030,
                         "src": "3457:9:9",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_Rewards_$1868",
+                          "typeIdentifier": "t_contract$_Rewards_$1913",
                           "typeString": "contract Rewards"
                         }
                       },
@@ -6529,7 +6567,7 @@
                       "lValueRequested": false,
                       "memberName": "addMinters",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 1643,
+                      "referencedDeclaration": 1688,
                       "src": "3457:20:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$returns$_t_bool_$",
@@ -6744,7 +6782,7 @@
               ],
               "src": "3437:6:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "3380:174:9",
             "stateMutability": "nonpayable",
             "superFunction": null,
@@ -6763,7 +6801,7 @@
                     "name": "roundMask",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 1563,
+                    "referencedDeclaration": 1608,
                     "src": "3638:9:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
@@ -6823,7 +6861,7 @@
               ],
               "src": "3613:6:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "3568:88:9",
             "stateMutability": "view",
             "superFunction": null,
@@ -6869,7 +6907,7 @@
                         "referencedDeclaration": 1030,
                         "src": "3742:9:9",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_Rewards_$1868",
+                          "typeIdentifier": "t_contract$_Rewards_$1913",
                           "typeString": "contract Rewards"
                         }
                       },
@@ -6880,7 +6918,7 @@
                       "lValueRequested": false,
                       "memberName": "removeMinters",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 1664,
+                      "referencedDeclaration": 1709,
                       "src": "3742:23:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$returns$_t_bool_$",
@@ -7025,7 +7063,7 @@
               ],
               "src": "3725:6:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "3665:137:9",
             "stateMutability": "nonpayable",
             "superFunction": null,
@@ -7052,7 +7090,7 @@
                         "referencedDeclaration": 1030,
                         "src": "4043:9:9",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_Rewards_$1868",
+                          "typeIdentifier": "t_contract$_Rewards_$1913",
                           "typeString": "contract Rewards"
                         }
                       },
@@ -7063,7 +7101,7 @@
                       "lValueRequested": false,
                       "memberName": "trigger",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 1690,
+                      "referencedDeclaration": 1735,
                       "src": "4043:17:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$__$returns$_t_bool_$",
@@ -7180,7 +7218,7 @@
               ],
               "src": "4022:6:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "3968:128:9",
             "stateMutability": "nonpayable",
             "superFunction": null,
@@ -7188,96 +7226,9 @@
           },
           {
             "body": {
-              "id": 1516,
+              "id": 1521,
               "nodeType": "Block",
-              "src": "4182:20:9",
-              "statements": []
-            },
-            "documentation": null,
-            "id": 1517,
-            "implemented": true,
-            "kind": "function",
-            "modifiers": [],
-            "name": "showUserPostingScores",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 1512,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 1511,
-                  "name": "_user",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 1517,
-                  "src": "4141:13:9",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_address",
-                    "typeString": "address"
-                  },
-                  "typeName": {
-                    "id": 1510,
-                    "name": "address",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "4141:7:9",
-                    "stateMutability": "nonpayable",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_address",
-                      "typeString": "address"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "4140:15:9"
-            },
-            "returnParameters": {
-              "id": 1515,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 1514,
-                  "name": "",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 1517,
-                  "src": "4177:4:9",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 1513,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "4177:4:9",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "4176:6:9"
-            },
-            "scope": 1550,
-            "src": "4110:92:9",
-            "stateMutability": "view",
-            "superFunction": null,
-            "visibility": "public"
-          },
-          {
-            "body": {
-              "id": 1529,
-              "nodeType": "Block",
-              "src": "4273:54:9",
+              "src": "4178:55:9",
               "statements": [
                 {
                   "expression": {
@@ -7286,26 +7237,26 @@
                       "argumentTypes": null,
                       "baseExpression": {
                         "argumentTypes": null,
-                        "id": 1524,
+                        "id": 1516,
                         "name": "userScores",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
                         "referencedDeclaration": 1058,
-                        "src": "4292:10:9",
+                        "src": "4197:10:9",
                         "typeDescriptions": {
                           "typeIdentifier": "t_mapping$_t_address_$_t_struct$_Scores_$1054_storage_$",
                           "typeString": "mapping(address => struct Perligo.Scores storage ref)"
                         }
                       },
-                      "id": 1526,
+                      "id": 1518,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 1525,
+                        "id": 1517,
                         "name": "_user",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1519,
-                        "src": "4303:5:9",
+                        "referencedDeclaration": 1511,
+                        "src": "4208:5:9",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -7316,51 +7267,51 @@
                       "isPure": false,
                       "lValueRequested": false,
                       "nodeType": "IndexAccess",
-                      "src": "4292:17:9",
+                      "src": "4197:17:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_struct$_Scores_$1054_storage",
                         "typeString": "struct Perligo.Scores storage ref"
                       }
                     },
-                    "id": 1527,
+                    "id": 1519,
                     "isConstant": false,
                     "isLValue": true,
                     "isPure": false,
                     "lValueRequested": false,
-                    "memberName": "userFama",
+                    "memberName": "postScore",
                     "nodeType": "MemberAccess",
-                    "referencedDeclaration": 1053,
-                    "src": "4292:26:9",
+                    "referencedDeclaration": 1045,
+                    "src": "4197:27:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
-                  "functionReturnParameters": 1523,
-                  "id": 1528,
+                  "functionReturnParameters": 1515,
+                  "id": 1520,
                   "nodeType": "Return",
-                  "src": "4285:33:9"
+                  "src": "4190:34:9"
                 }
               ]
             },
             "documentation": null,
-            "id": 1530,
+            "id": 1522,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
-            "name": "showUserFama",
+            "name": "showUserPostScore",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1520,
+              "id": 1512,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1519,
+                  "id": 1511,
                   "name": "_user",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1530,
-                  "src": "4232:13:9",
+                  "scope": 1522,
+                  "src": "4137:13:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -7368,10 +7319,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1518,
+                    "id": 1510,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "4232:7:9",
+                    "src": "4137:7:9",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -7382,19 +7333,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "4231:15:9"
+              "src": "4136:15:9"
             },
             "returnParameters": {
-              "id": 1523,
+              "id": 1515,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1522,
+                  "id": 1514,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1530,
-                  "src": "4268:4:9",
+                  "scope": 1522,
+                  "src": "4173:4:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -7402,10 +7353,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1521,
+                    "id": 1513,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "4268:4:9",
+                    "src": "4173:4:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -7415,32 +7366,332 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "4267:6:9"
+              "src": "4172:6:9"
             },
-            "scope": 1550,
-            "src": "4210:117:9",
+            "scope": 1595,
+            "src": "4110:123:9",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 1548,
+              "id": 1534,
               "nodeType": "Block",
-              "src": "4398:116:9",
+              "src": "4318:58:9",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "expression": {
+                      "argumentTypes": null,
+                      "baseExpression": {
+                        "argumentTypes": null,
+                        "id": 1529,
+                        "name": "userScores",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1058,
+                        "src": "4337:10:9",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_address_$_t_struct$_Scores_$1054_storage_$",
+                          "typeString": "mapping(address => struct Perligo.Scores storage ref)"
+                        }
+                      },
+                      "id": 1531,
+                      "indexExpression": {
+                        "argumentTypes": null,
+                        "id": 1530,
+                        "name": "_user",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1524,
+                        "src": "4348:5:9",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "IndexAccess",
+                      "src": "4337:17:9",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_Scores_$1054_storage",
+                        "typeString": "struct Perligo.Scores storage ref"
+                      }
+                    },
+                    "id": 1532,
+                    "isConstant": false,
+                    "isLValue": true,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "memberName": "commentScore",
+                    "nodeType": "MemberAccess",
+                    "referencedDeclaration": 1047,
+                    "src": "4337:30:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 1528,
+                  "id": 1533,
+                  "nodeType": "Return",
+                  "src": "4330:37:9"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 1535,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "showUserCommentScore",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1525,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1524,
+                  "name": "_user",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1535,
+                  "src": "4277:13:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1523,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4277:7:9",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4276:15:9"
+            },
+            "returnParameters": {
+              "id": 1528,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1527,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1535,
+                  "src": "4313:4:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1526,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4313:4:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4312:6:9"
+            },
+            "scope": 1595,
+            "src": "4247:129:9",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 1547,
+              "nodeType": "Block",
+              "src": "4458:55:9",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "expression": {
+                      "argumentTypes": null,
+                      "baseExpression": {
+                        "argumentTypes": null,
+                        "id": 1542,
+                        "name": "userScores",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1058,
+                        "src": "4477:10:9",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_address_$_t_struct$_Scores_$1054_storage_$",
+                          "typeString": "mapping(address => struct Perligo.Scores storage ref)"
+                        }
+                      },
+                      "id": 1544,
+                      "indexExpression": {
+                        "argumentTypes": null,
+                        "id": 1543,
+                        "name": "_user",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1537,
+                        "src": "4488:5:9",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "IndexAccess",
+                      "src": "4477:17:9",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_Scores_$1054_storage",
+                        "typeString": "struct Perligo.Scores storage ref"
+                      }
+                    },
+                    "id": 1545,
+                    "isConstant": false,
+                    "isLValue": true,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "memberName": "voteScore",
+                    "nodeType": "MemberAccess",
+                    "referencedDeclaration": 1049,
+                    "src": "4477:27:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 1541,
+                  "id": 1546,
+                  "nodeType": "Return",
+                  "src": "4470:34:9"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 1548,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "showUserVoteScore",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1538,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1537,
+                  "name": "_user",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1548,
+                  "src": "4417:13:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1536,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4417:7:9",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4416:15:9"
+            },
+            "returnParameters": {
+              "id": 1541,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1540,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1548,
+                  "src": "4453:4:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1539,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4453:4:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4452:6:9"
+            },
+            "scope": 1595,
+            "src": "4390:123:9",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 1574,
+              "nodeType": "Block",
+              "src": "4590:150:9",
               "statements": [
                 {
                   "assignments": [
-                    1538
+                    1556
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 1538,
-                      "name": "userMask",
+                      "id": 1556,
+                      "name": "tScore",
                       "nodeType": "VariableDeclaration",
-                      "scope": 1548,
-                      "src": "4412:16:9",
+                      "scope": 1574,
+                      "src": "4602:11:9",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -7448,10 +7699,10 @@
                         "typeString": "uint256"
                       },
                       "typeName": {
-                        "id": 1537,
-                        "name": "uint256",
+                        "id": 1555,
+                        "name": "uint",
                         "nodeType": "ElementaryTypeName",
-                        "src": "4412:7:9",
+                        "src": "4602:4:9",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -7461,27 +7712,376 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 1539,
-                  "initialValue": null,
+                  "id": 1571,
+                  "initialValue": {
+                    "argumentTypes": null,
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 1570,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "argumentTypes": null,
+                      "commonType": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      },
+                      "id": 1565,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "leftExpression": {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "baseExpression": {
+                            "argumentTypes": null,
+                            "id": 1557,
+                            "name": "userScores",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1058,
+                            "src": "4616:10:9",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_Scores_$1054_storage_$",
+                              "typeString": "mapping(address => struct Perligo.Scores storage ref)"
+                            }
+                          },
+                          "id": 1559,
+                          "indexExpression": {
+                            "argumentTypes": null,
+                            "id": 1558,
+                            "name": "_user",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1550,
+                            "src": "4627:5:9",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          },
+                          "isConstant": false,
+                          "isLValue": true,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "nodeType": "IndexAccess",
+                          "src": "4616:17:9",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_Scores_$1054_storage",
+                            "typeString": "struct Perligo.Scores storage ref"
+                          }
+                        },
+                        "id": 1560,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "postScore",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 1045,
+                        "src": "4616:27:9",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "nodeType": "BinaryOperation",
+                      "operator": "+",
+                      "rightExpression": {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "baseExpression": {
+                            "argumentTypes": null,
+                            "id": 1561,
+                            "name": "userScores",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1058,
+                            "src": "4646:10:9",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_Scores_$1054_storage_$",
+                              "typeString": "mapping(address => struct Perligo.Scores storage ref)"
+                            }
+                          },
+                          "id": 1563,
+                          "indexExpression": {
+                            "argumentTypes": null,
+                            "id": 1562,
+                            "name": "_user",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1550,
+                            "src": "4657:5:9",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          },
+                          "isConstant": false,
+                          "isLValue": true,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "nodeType": "IndexAccess",
+                          "src": "4646:17:9",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_Scores_$1054_storage",
+                            "typeString": "struct Perligo.Scores storage ref"
+                          }
+                        },
+                        "id": 1564,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "commentScore",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 1047,
+                        "src": "4646:30:9",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "src": "4616:60:9",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "+",
+                    "rightExpression": {
+                      "argumentTypes": null,
+                      "expression": {
+                        "argumentTypes": null,
+                        "baseExpression": {
+                          "argumentTypes": null,
+                          "id": 1566,
+                          "name": "userScores",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1058,
+                          "src": "4679:10:9",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_mapping$_t_address_$_t_struct$_Scores_$1054_storage_$",
+                            "typeString": "mapping(address => struct Perligo.Scores storage ref)"
+                          }
+                        },
+                        "id": 1568,
+                        "indexExpression": {
+                          "argumentTypes": null,
+                          "id": 1567,
+                          "name": "_user",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1550,
+                          "src": "4690:5:9",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "nodeType": "IndexAccess",
+                        "src": "4679:17:9",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_Scores_$1054_storage",
+                          "typeString": "struct Perligo.Scores storage ref"
+                        }
+                      },
+                      "id": 1569,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "voteScore",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 1049,
+                      "src": "4679:27:9",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "4616:90:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "4412:16:9"
+                  "src": "4602:104:9"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 1544,
+                    "id": 1572,
+                    "name": "tScore",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 1556,
+                    "src": "4725:6:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 1554,
+                  "id": 1573,
+                  "nodeType": "Return",
+                  "src": "4718:13:9"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 1575,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "showUserTotalScore",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1551,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1550,
+                  "name": "_user",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1575,
+                  "src": "4549:13:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1549,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4549:7:9",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4548:15:9"
+            },
+            "returnParameters": {
+              "id": 1554,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1553,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1575,
+                  "src": "4585:4:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1552,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4585:4:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4584:6:9"
+            },
+            "scope": 1595,
+            "src": "4521:219:9",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 1593,
+              "nodeType": "Block",
+              "src": "4812:116:9",
+              "statements": [
+                {
+                  "assignments": [
+                    1583
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 1583,
+                      "name": "userMask",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 1593,
+                      "src": "4826:16:9",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      },
+                      "typeName": {
+                        "id": 1582,
+                        "name": "uint256",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "4826:7:9",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 1584,
+                  "initialValue": null,
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "4826:16:9"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 1589,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "argumentTypes": null,
-                      "id": 1540,
+                      "id": 1585,
                       "name": "userMask",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1538,
-                      "src": "4442:8:9",
+                      "referencedDeclaration": 1583,
+                      "src": "4856:8:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -7493,26 +8093,26 @@
                       "argumentTypes": null,
                       "baseExpression": {
                         "argumentTypes": null,
-                        "id": 1541,
+                        "id": 1586,
                         "name": "participantMask",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1581,
-                        "src": "4453:15:9",
+                        "referencedDeclaration": 1626,
+                        "src": "4867:15:9",
                         "typeDescriptions": {
                           "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
                           "typeString": "mapping(address => uint256)"
                         }
                       },
-                      "id": 1543,
+                      "id": 1588,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 1542,
+                        "id": 1587,
                         "name": "_user",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1532,
-                        "src": "4469:5:9",
+                        "referencedDeclaration": 1577,
+                        "src": "4883:5:9",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -7523,61 +8123,61 @@
                       "isPure": false,
                       "lValueRequested": false,
                       "nodeType": "IndexAccess",
-                      "src": "4453:22:9",
+                      "src": "4867:22:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "src": "4442:33:9",
+                    "src": "4856:33:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
-                  "id": 1545,
+                  "id": 1590,
                   "nodeType": "ExpressionStatement",
-                  "src": "4442:33:9"
+                  "src": "4856:33:9"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 1546,
+                    "id": 1591,
                     "name": "userMask",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 1538,
-                    "src": "4496:8:9",
+                    "referencedDeclaration": 1583,
+                    "src": "4910:8:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
-                  "functionReturnParameters": 1536,
-                  "id": 1547,
+                  "functionReturnParameters": 1581,
+                  "id": 1592,
                   "nodeType": "Return",
-                  "src": "4489:15:9"
+                  "src": "4903:15:9"
                 }
               ]
             },
             "documentation": null,
-            "id": 1549,
+            "id": 1594,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "showUserMask",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1533,
+              "id": 1578,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1532,
+                  "id": 1577,
                   "name": "_user",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1549,
-                  "src": "4357:13:9",
+                  "scope": 1594,
+                  "src": "4771:13:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -7585,10 +8185,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1531,
+                    "id": 1576,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "4357:7:9",
+                    "src": "4771:7:9",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -7599,19 +8199,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "4356:15:9"
+              "src": "4770:15:9"
             },
             "returnParameters": {
-              "id": 1536,
+              "id": 1581,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1535,
+                  "id": 1580,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1549,
-                  "src": "4393:4:9",
+                  "scope": 1594,
+                  "src": "4807:4:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -7619,10 +8219,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1534,
+                    "id": 1579,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "4393:4:9",
+                    "src": "4807:4:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -7632,29 +8232,29 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "4392:6:9"
+              "src": "4806:6:9"
             },
-            "scope": 1550,
-            "src": "4335:179:9",
+            "scope": 1595,
+            "src": "4749:179:9",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 1551,
-        "src": "51:4473:9"
+        "scope": 1596,
+        "src": "51:4887:9"
       }
     ],
-    "src": "0:4524:9"
+    "src": "0:4938:9"
   },
   "legacyAST": {
     "absolutePath": "/home/matt/myproject/Perligo/contracts/Perligo.sol",
     "exportedSymbols": {
       "Perligo": [
-        1550
+        1595
       ]
     },
-    "id": 1551,
+    "id": 1596,
     "nodeType": "SourceUnit",
     "nodes": [
       {
@@ -7673,8 +8273,8 @@
         "file": "./Rewards.sol",
         "id": 1021,
         "nodeType": "ImportDirective",
-        "scope": 1551,
-        "sourceUnit": 1869,
+        "scope": 1596,
+        "sourceUnit": 1914,
         "src": "26:23:9",
         "symbolAliases": [],
         "unitAlias": ""
@@ -7688,10 +8288,10 @@
               "id": 1022,
               "name": "Rewards",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 1868,
+              "referencedDeclaration": 1913,
               "src": "71:7:9",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Rewards_$1868",
+                "typeIdentifier": "t_contract$_Rewards_$1913",
                 "typeString": "contract Rewards"
               }
             },
@@ -7707,15 +8307,15 @@
           864,
           892,
           961,
-          1868
+          1913
         ],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 1550,
+        "id": 1595,
         "linearizedBaseContracts": [
-          1550,
-          1868,
+          1595,
+          1913,
           864,
           892,
           214,
@@ -7731,12 +8331,12 @@
             "id": 1030,
             "name": "ourReward",
             "nodeType": "VariableDeclaration",
-            "scope": 1550,
+            "scope": 1595,
             "src": "95:46:9",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_Rewards_$1868",
+              "typeIdentifier": "t_contract$_Rewards_$1913",
               "typeString": "contract Rewards"
             },
             "typeName": {
@@ -7744,10 +8344,10 @@
               "id": 1024,
               "name": "Rewards",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 1868,
+              "referencedDeclaration": 1913,
               "src": "95:7:9",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Rewards_$1868",
+                "typeIdentifier": "t_contract$_Rewards_$1913",
                 "typeString": "contract Rewards"
               }
             },
@@ -7810,7 +8410,7 @@
                 "nodeType": "NewExpression",
                 "src": "115:11:9",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_function_creation_nonpayable$_t_uint256_$_t_uint256_$returns$_t_contract$_Rewards_$1868_$",
+                  "typeIdentifier": "t_function_creation_nonpayable$_t_uint256_$_t_uint256_$returns$_t_contract$_Rewards_$1913_$",
                   "typeString": "function (uint256,uint256) returns (contract Rewards)"
                 },
                 "typeName": {
@@ -7818,10 +8418,10 @@
                   "id": 1025,
                   "name": "Rewards",
                   "nodeType": "UserDefinedTypeName",
-                  "referencedDeclaration": 1868,
+                  "referencedDeclaration": 1913,
                   "src": "119:7:9",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_Rewards_$1868",
+                    "typeIdentifier": "t_contract$_Rewards_$1913",
                     "typeString": "contract Rewards"
                   }
                 }
@@ -7836,7 +8436,7 @@
               "nodeType": "FunctionCall",
               "src": "115:26:9",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Rewards_$1868",
+                "typeIdentifier": "t_contract$_Rewards_$1913",
                 "typeString": "contract Rewards"
               }
             },
@@ -7847,7 +8447,7 @@
             "id": 1032,
             "name": "owner",
             "nodeType": "VariableDeclaration",
-            "scope": 1550,
+            "scope": 1595,
             "src": "156:20:9",
             "stateVariable": true,
             "storageLocation": "default",
@@ -7898,7 +8498,7 @@
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1883,
+                            "referencedDeclaration": 1928,
                             "src": "229:3:9",
                             "typeDescriptions": {
                               "typeIdentifier": "t_magic_message",
@@ -7952,10 +8552,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        1886,
-                        1887
+                        1931,
+                        1932
                       ],
-                      "referencedDeclaration": 1886,
+                      "referencedDeclaration": 1931,
                       "src": "221:7:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -8137,7 +8737,7 @@
             ],
             "name": "Scores",
             "nodeType": "StructDefinition",
-            "scope": 1550,
+            "scope": 1595,
             "src": "284:166:9",
             "visibility": "public"
           },
@@ -8146,7 +8746,7 @@
             "id": 1058,
             "name": "userScores",
             "nodeType": "VariableDeclaration",
-            "scope": 1550,
+            "scope": 1595,
             "src": "466:37:9",
             "stateVariable": true,
             "storageLocation": "default",
@@ -8193,7 +8793,7 @@
             "id": 1061,
             "name": "reviewers",
             "nodeType": "VariableDeclaration",
-            "scope": 1550,
+            "scope": 1595,
             "src": "518:19:9",
             "stateVariable": true,
             "storageLocation": "default",
@@ -8446,7 +9046,7 @@
               ],
               "src": "623:6:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "546:168:9",
             "stateMutability": "nonpayable",
             "superFunction": null,
@@ -8679,10 +9279,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        1886,
-                        1887
+                        1931,
+                        1932
                       ],
-                      "referencedDeclaration": 1886,
+                      "referencedDeclaration": 1931,
                       "src": "832:7:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -8757,7 +9357,7 @@
                       "name": "now",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1885,
+                      "referencedDeclaration": 1930,
                       "src": "936:3:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -9975,7 +10575,7 @@
               ],
               "src": "814:6:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "728:794:9",
             "stateMutability": "nonpayable",
             "superFunction": null,
@@ -10208,10 +10808,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        1886,
-                        1887
+                        1931,
+                        1932
                       ],
-                      "referencedDeclaration": 1886,
+                      "referencedDeclaration": 1931,
                       "src": "1623:7:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -10286,7 +10886,7 @@
                       "name": "now",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1885,
+                      "referencedDeclaration": 1930,
                       "src": "1728:3:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -11383,7 +11983,7 @@
               "parameters": [],
               "src": "1611:0:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "1536:744:9",
             "stateMutability": "nonpayable",
             "superFunction": null,
@@ -11919,7 +12519,7 @@
                       "name": "totalParticipants",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1568,
+                      "referencedDeclaration": 1613,
                       "src": "2389:17:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -12092,7 +12692,7 @@
               ],
               "src": "2353:6:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "2294:364:9",
             "stateMutability": "nonpayable",
             "superFunction": null,
@@ -12719,7 +13319,7 @@
                       "name": "totalParticipants",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1568,
+                      "referencedDeclaration": 1613,
                       "src": "2781:17:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -12932,7 +13532,7 @@
                               "name": "participantMask",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 1581,
+                              "referencedDeclaration": 1626,
                               "src": "3223:15:9",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
@@ -13012,7 +13612,7 @@
                                 "name": "participantMask",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 1581,
+                                "referencedDeclaration": 1626,
                                 "src": "3255:15:9",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
@@ -13238,7 +13838,7 @@
                       "name": "totalParticipants",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1568,
+                      "referencedDeclaration": 1613,
                       "src": "3183:17:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -13391,7 +13991,7 @@
               ],
               "src": "2714:6:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "2672:690:9",
             "stateMutability": "nonpayable",
             "superFunction": null,
@@ -13437,7 +14037,7 @@
                         "referencedDeclaration": 1030,
                         "src": "3457:9:9",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_Rewards_$1868",
+                          "typeIdentifier": "t_contract$_Rewards_$1913",
                           "typeString": "contract Rewards"
                         }
                       },
@@ -13448,7 +14048,7 @@
                       "lValueRequested": false,
                       "memberName": "addMinters",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 1643,
+                      "referencedDeclaration": 1688,
                       "src": "3457:20:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$returns$_t_bool_$",
@@ -13663,7 +14263,7 @@
               ],
               "src": "3437:6:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "3380:174:9",
             "stateMutability": "nonpayable",
             "superFunction": null,
@@ -13682,7 +14282,7 @@
                     "name": "roundMask",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 1563,
+                    "referencedDeclaration": 1608,
                     "src": "3638:9:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
@@ -13742,7 +14342,7 @@
               ],
               "src": "3613:6:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "3568:88:9",
             "stateMutability": "view",
             "superFunction": null,
@@ -13788,7 +14388,7 @@
                         "referencedDeclaration": 1030,
                         "src": "3742:9:9",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_Rewards_$1868",
+                          "typeIdentifier": "t_contract$_Rewards_$1913",
                           "typeString": "contract Rewards"
                         }
                       },
@@ -13799,7 +14399,7 @@
                       "lValueRequested": false,
                       "memberName": "removeMinters",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 1664,
+                      "referencedDeclaration": 1709,
                       "src": "3742:23:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$returns$_t_bool_$",
@@ -13944,7 +14544,7 @@
               ],
               "src": "3725:6:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "3665:137:9",
             "stateMutability": "nonpayable",
             "superFunction": null,
@@ -13971,7 +14571,7 @@
                         "referencedDeclaration": 1030,
                         "src": "4043:9:9",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_Rewards_$1868",
+                          "typeIdentifier": "t_contract$_Rewards_$1913",
                           "typeString": "contract Rewards"
                         }
                       },
@@ -13982,7 +14582,7 @@
                       "lValueRequested": false,
                       "memberName": "trigger",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 1690,
+                      "referencedDeclaration": 1735,
                       "src": "4043:17:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$__$returns$_t_bool_$",
@@ -14099,7 +14699,7 @@
               ],
               "src": "4022:6:9"
             },
-            "scope": 1550,
+            "scope": 1595,
             "src": "3968:128:9",
             "stateMutability": "nonpayable",
             "superFunction": null,
@@ -14107,96 +14707,9 @@
           },
           {
             "body": {
-              "id": 1516,
+              "id": 1521,
               "nodeType": "Block",
-              "src": "4182:20:9",
-              "statements": []
-            },
-            "documentation": null,
-            "id": 1517,
-            "implemented": true,
-            "kind": "function",
-            "modifiers": [],
-            "name": "showUserPostingScores",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 1512,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 1511,
-                  "name": "_user",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 1517,
-                  "src": "4141:13:9",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_address",
-                    "typeString": "address"
-                  },
-                  "typeName": {
-                    "id": 1510,
-                    "name": "address",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "4141:7:9",
-                    "stateMutability": "nonpayable",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_address",
-                      "typeString": "address"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "4140:15:9"
-            },
-            "returnParameters": {
-              "id": 1515,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 1514,
-                  "name": "",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 1517,
-                  "src": "4177:4:9",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 1513,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "4177:4:9",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "4176:6:9"
-            },
-            "scope": 1550,
-            "src": "4110:92:9",
-            "stateMutability": "view",
-            "superFunction": null,
-            "visibility": "public"
-          },
-          {
-            "body": {
-              "id": 1529,
-              "nodeType": "Block",
-              "src": "4273:54:9",
+              "src": "4178:55:9",
               "statements": [
                 {
                   "expression": {
@@ -14205,26 +14718,26 @@
                       "argumentTypes": null,
                       "baseExpression": {
                         "argumentTypes": null,
-                        "id": 1524,
+                        "id": 1516,
                         "name": "userScores",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
                         "referencedDeclaration": 1058,
-                        "src": "4292:10:9",
+                        "src": "4197:10:9",
                         "typeDescriptions": {
                           "typeIdentifier": "t_mapping$_t_address_$_t_struct$_Scores_$1054_storage_$",
                           "typeString": "mapping(address => struct Perligo.Scores storage ref)"
                         }
                       },
-                      "id": 1526,
+                      "id": 1518,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 1525,
+                        "id": 1517,
                         "name": "_user",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1519,
-                        "src": "4303:5:9",
+                        "referencedDeclaration": 1511,
+                        "src": "4208:5:9",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -14235,51 +14748,51 @@
                       "isPure": false,
                       "lValueRequested": false,
                       "nodeType": "IndexAccess",
-                      "src": "4292:17:9",
+                      "src": "4197:17:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_struct$_Scores_$1054_storage",
                         "typeString": "struct Perligo.Scores storage ref"
                       }
                     },
-                    "id": 1527,
+                    "id": 1519,
                     "isConstant": false,
                     "isLValue": true,
                     "isPure": false,
                     "lValueRequested": false,
-                    "memberName": "userFama",
+                    "memberName": "postScore",
                     "nodeType": "MemberAccess",
-                    "referencedDeclaration": 1053,
-                    "src": "4292:26:9",
+                    "referencedDeclaration": 1045,
+                    "src": "4197:27:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
-                  "functionReturnParameters": 1523,
-                  "id": 1528,
+                  "functionReturnParameters": 1515,
+                  "id": 1520,
                   "nodeType": "Return",
-                  "src": "4285:33:9"
+                  "src": "4190:34:9"
                 }
               ]
             },
             "documentation": null,
-            "id": 1530,
+            "id": 1522,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
-            "name": "showUserFama",
+            "name": "showUserPostScore",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1520,
+              "id": 1512,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1519,
+                  "id": 1511,
                   "name": "_user",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1530,
-                  "src": "4232:13:9",
+                  "scope": 1522,
+                  "src": "4137:13:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -14287,10 +14800,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1518,
+                    "id": 1510,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "4232:7:9",
+                    "src": "4137:7:9",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -14301,19 +14814,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "4231:15:9"
+              "src": "4136:15:9"
             },
             "returnParameters": {
-              "id": 1523,
+              "id": 1515,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1522,
+                  "id": 1514,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1530,
-                  "src": "4268:4:9",
+                  "scope": 1522,
+                  "src": "4173:4:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -14321,10 +14834,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1521,
+                    "id": 1513,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "4268:4:9",
+                    "src": "4173:4:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -14334,32 +14847,332 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "4267:6:9"
+              "src": "4172:6:9"
             },
-            "scope": 1550,
-            "src": "4210:117:9",
+            "scope": 1595,
+            "src": "4110:123:9",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 1548,
+              "id": 1534,
               "nodeType": "Block",
-              "src": "4398:116:9",
+              "src": "4318:58:9",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "expression": {
+                      "argumentTypes": null,
+                      "baseExpression": {
+                        "argumentTypes": null,
+                        "id": 1529,
+                        "name": "userScores",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1058,
+                        "src": "4337:10:9",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_address_$_t_struct$_Scores_$1054_storage_$",
+                          "typeString": "mapping(address => struct Perligo.Scores storage ref)"
+                        }
+                      },
+                      "id": 1531,
+                      "indexExpression": {
+                        "argumentTypes": null,
+                        "id": 1530,
+                        "name": "_user",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1524,
+                        "src": "4348:5:9",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "IndexAccess",
+                      "src": "4337:17:9",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_Scores_$1054_storage",
+                        "typeString": "struct Perligo.Scores storage ref"
+                      }
+                    },
+                    "id": 1532,
+                    "isConstant": false,
+                    "isLValue": true,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "memberName": "commentScore",
+                    "nodeType": "MemberAccess",
+                    "referencedDeclaration": 1047,
+                    "src": "4337:30:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 1528,
+                  "id": 1533,
+                  "nodeType": "Return",
+                  "src": "4330:37:9"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 1535,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "showUserCommentScore",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1525,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1524,
+                  "name": "_user",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1535,
+                  "src": "4277:13:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1523,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4277:7:9",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4276:15:9"
+            },
+            "returnParameters": {
+              "id": 1528,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1527,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1535,
+                  "src": "4313:4:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1526,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4313:4:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4312:6:9"
+            },
+            "scope": 1595,
+            "src": "4247:129:9",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 1547,
+              "nodeType": "Block",
+              "src": "4458:55:9",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "expression": {
+                      "argumentTypes": null,
+                      "baseExpression": {
+                        "argumentTypes": null,
+                        "id": 1542,
+                        "name": "userScores",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1058,
+                        "src": "4477:10:9",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_address_$_t_struct$_Scores_$1054_storage_$",
+                          "typeString": "mapping(address => struct Perligo.Scores storage ref)"
+                        }
+                      },
+                      "id": 1544,
+                      "indexExpression": {
+                        "argumentTypes": null,
+                        "id": 1543,
+                        "name": "_user",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1537,
+                        "src": "4488:5:9",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "IndexAccess",
+                      "src": "4477:17:9",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_Scores_$1054_storage",
+                        "typeString": "struct Perligo.Scores storage ref"
+                      }
+                    },
+                    "id": 1545,
+                    "isConstant": false,
+                    "isLValue": true,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "memberName": "voteScore",
+                    "nodeType": "MemberAccess",
+                    "referencedDeclaration": 1049,
+                    "src": "4477:27:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 1541,
+                  "id": 1546,
+                  "nodeType": "Return",
+                  "src": "4470:34:9"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 1548,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "showUserVoteScore",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1538,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1537,
+                  "name": "_user",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1548,
+                  "src": "4417:13:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1536,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4417:7:9",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4416:15:9"
+            },
+            "returnParameters": {
+              "id": 1541,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1540,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1548,
+                  "src": "4453:4:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1539,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4453:4:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4452:6:9"
+            },
+            "scope": 1595,
+            "src": "4390:123:9",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 1574,
+              "nodeType": "Block",
+              "src": "4590:150:9",
               "statements": [
                 {
                   "assignments": [
-                    1538
+                    1556
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 1538,
-                      "name": "userMask",
+                      "id": 1556,
+                      "name": "tScore",
                       "nodeType": "VariableDeclaration",
-                      "scope": 1548,
-                      "src": "4412:16:9",
+                      "scope": 1574,
+                      "src": "4602:11:9",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -14367,10 +15180,10 @@
                         "typeString": "uint256"
                       },
                       "typeName": {
-                        "id": 1537,
-                        "name": "uint256",
+                        "id": 1555,
+                        "name": "uint",
                         "nodeType": "ElementaryTypeName",
-                        "src": "4412:7:9",
+                        "src": "4602:4:9",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -14380,27 +15193,376 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 1539,
-                  "initialValue": null,
+                  "id": 1571,
+                  "initialValue": {
+                    "argumentTypes": null,
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 1570,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "argumentTypes": null,
+                      "commonType": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      },
+                      "id": 1565,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "leftExpression": {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "baseExpression": {
+                            "argumentTypes": null,
+                            "id": 1557,
+                            "name": "userScores",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1058,
+                            "src": "4616:10:9",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_Scores_$1054_storage_$",
+                              "typeString": "mapping(address => struct Perligo.Scores storage ref)"
+                            }
+                          },
+                          "id": 1559,
+                          "indexExpression": {
+                            "argumentTypes": null,
+                            "id": 1558,
+                            "name": "_user",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1550,
+                            "src": "4627:5:9",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          },
+                          "isConstant": false,
+                          "isLValue": true,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "nodeType": "IndexAccess",
+                          "src": "4616:17:9",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_Scores_$1054_storage",
+                            "typeString": "struct Perligo.Scores storage ref"
+                          }
+                        },
+                        "id": 1560,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "postScore",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 1045,
+                        "src": "4616:27:9",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "nodeType": "BinaryOperation",
+                      "operator": "+",
+                      "rightExpression": {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "baseExpression": {
+                            "argumentTypes": null,
+                            "id": 1561,
+                            "name": "userScores",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1058,
+                            "src": "4646:10:9",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_Scores_$1054_storage_$",
+                              "typeString": "mapping(address => struct Perligo.Scores storage ref)"
+                            }
+                          },
+                          "id": 1563,
+                          "indexExpression": {
+                            "argumentTypes": null,
+                            "id": 1562,
+                            "name": "_user",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1550,
+                            "src": "4657:5:9",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          },
+                          "isConstant": false,
+                          "isLValue": true,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "nodeType": "IndexAccess",
+                          "src": "4646:17:9",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_Scores_$1054_storage",
+                            "typeString": "struct Perligo.Scores storage ref"
+                          }
+                        },
+                        "id": 1564,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "commentScore",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 1047,
+                        "src": "4646:30:9",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "src": "4616:60:9",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "+",
+                    "rightExpression": {
+                      "argumentTypes": null,
+                      "expression": {
+                        "argumentTypes": null,
+                        "baseExpression": {
+                          "argumentTypes": null,
+                          "id": 1566,
+                          "name": "userScores",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1058,
+                          "src": "4679:10:9",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_mapping$_t_address_$_t_struct$_Scores_$1054_storage_$",
+                            "typeString": "mapping(address => struct Perligo.Scores storage ref)"
+                          }
+                        },
+                        "id": 1568,
+                        "indexExpression": {
+                          "argumentTypes": null,
+                          "id": 1567,
+                          "name": "_user",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1550,
+                          "src": "4690:5:9",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "nodeType": "IndexAccess",
+                        "src": "4679:17:9",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_Scores_$1054_storage",
+                          "typeString": "struct Perligo.Scores storage ref"
+                        }
+                      },
+                      "id": 1569,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "voteScore",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 1049,
+                      "src": "4679:27:9",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "4616:90:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "4412:16:9"
+                  "src": "4602:104:9"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 1544,
+                    "id": 1572,
+                    "name": "tScore",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 1556,
+                    "src": "4725:6:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 1554,
+                  "id": 1573,
+                  "nodeType": "Return",
+                  "src": "4718:13:9"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 1575,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "showUserTotalScore",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1551,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1550,
+                  "name": "_user",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1575,
+                  "src": "4549:13:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1549,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4549:7:9",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4548:15:9"
+            },
+            "returnParameters": {
+              "id": 1554,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1553,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1575,
+                  "src": "4585:4:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1552,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4585:4:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4584:6:9"
+            },
+            "scope": 1595,
+            "src": "4521:219:9",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 1593,
+              "nodeType": "Block",
+              "src": "4812:116:9",
+              "statements": [
+                {
+                  "assignments": [
+                    1583
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 1583,
+                      "name": "userMask",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 1593,
+                      "src": "4826:16:9",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      },
+                      "typeName": {
+                        "id": 1582,
+                        "name": "uint256",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "4826:7:9",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 1584,
+                  "initialValue": null,
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "4826:16:9"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 1589,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "argumentTypes": null,
-                      "id": 1540,
+                      "id": 1585,
                       "name": "userMask",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1538,
-                      "src": "4442:8:9",
+                      "referencedDeclaration": 1583,
+                      "src": "4856:8:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -14412,26 +15574,26 @@
                       "argumentTypes": null,
                       "baseExpression": {
                         "argumentTypes": null,
-                        "id": 1541,
+                        "id": 1586,
                         "name": "participantMask",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1581,
-                        "src": "4453:15:9",
+                        "referencedDeclaration": 1626,
+                        "src": "4867:15:9",
                         "typeDescriptions": {
                           "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
                           "typeString": "mapping(address => uint256)"
                         }
                       },
-                      "id": 1543,
+                      "id": 1588,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 1542,
+                        "id": 1587,
                         "name": "_user",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1532,
-                        "src": "4469:5:9",
+                        "referencedDeclaration": 1577,
+                        "src": "4883:5:9",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -14442,61 +15604,61 @@
                       "isPure": false,
                       "lValueRequested": false,
                       "nodeType": "IndexAccess",
-                      "src": "4453:22:9",
+                      "src": "4867:22:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "src": "4442:33:9",
+                    "src": "4856:33:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
-                  "id": 1545,
+                  "id": 1590,
                   "nodeType": "ExpressionStatement",
-                  "src": "4442:33:9"
+                  "src": "4856:33:9"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 1546,
+                    "id": 1591,
                     "name": "userMask",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 1538,
-                    "src": "4496:8:9",
+                    "referencedDeclaration": 1583,
+                    "src": "4910:8:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
-                  "functionReturnParameters": 1536,
-                  "id": 1547,
+                  "functionReturnParameters": 1581,
+                  "id": 1592,
                   "nodeType": "Return",
-                  "src": "4489:15:9"
+                  "src": "4903:15:9"
                 }
               ]
             },
             "documentation": null,
-            "id": 1549,
+            "id": 1594,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "showUserMask",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1533,
+              "id": 1578,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1532,
+                  "id": 1577,
                   "name": "_user",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1549,
-                  "src": "4357:13:9",
+                  "scope": 1594,
+                  "src": "4771:13:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -14504,10 +15666,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1531,
+                    "id": 1576,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "4357:7:9",
+                    "src": "4771:7:9",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -14518,19 +15680,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "4356:15:9"
+              "src": "4770:15:9"
             },
             "returnParameters": {
-              "id": 1536,
+              "id": 1581,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1535,
+                  "id": 1580,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1549,
-                  "src": "4393:4:9",
+                  "scope": 1594,
+                  "src": "4807:4:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -14538,10 +15700,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1534,
+                    "id": 1579,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "4393:4:9",
+                    "src": "4807:4:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -14551,20 +15713,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "4392:6:9"
+              "src": "4806:6:9"
             },
-            "scope": 1550,
-            "src": "4335:179:9",
+            "scope": 1595,
+            "src": "4749:179:9",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 1551,
-        "src": "51:4473:9"
+        "scope": 1596,
+        "src": "51:4887:9"
       }
     ],
-    "src": "0:4524:9"
+    "src": "0:4938:9"
   },
   "compiler": {
     "name": "solc",
@@ -14572,7 +15734,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.5",
-  "updatedAt": "2019-12-05T02:13:57.702Z",
+  "updatedAt": "2019-12-06T22:23:38.634Z",
   "devdoc": {
     "methods": {
       "addMinters(address)": {

@@ -116,13 +116,23 @@ contract Perligo is Rewards {
             return true;
       }
       
-      function showUserPostingScores(address _user) public view returns (uint){
-          
+      function showUserPostScore(address _user) public view returns (uint){
+          return userScores[_user].postScore;
+      }
+      
+      function showUserCommentScore(address _user) public view returns (uint){
+          return userScores[_user].commentScore;
+      }
+      
+      function showUserVoteScore(address _user) public view returns (uint){
+          return userScores[_user].voteScore;
       }
 
-      function showUserFama(address _user) public view returns (uint){
-          return userScores[_user].userFama;
+      function showUserTotalScore(address _user) public view returns (uint){
+          uint tScore = userScores[_user].postScore + userScores[_user].commentScore + userScores[_user].voteScore;
+          return tScore;
       }
+
 
       function showUserMask(address _user) public view returns (uint){
             uint256 userMask;
