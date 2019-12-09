@@ -9,19 +9,20 @@ import {
     
     const items = [
       {
-        src: './images/catering.jpg',
-        altText: 'Airline',
-        caption: 'Airline'
+        src: 'https://cdn.pixabay.com/photo/2016/11/08/05/01/airline-1807486_1280.jpg',
+        altText: 'Airlines',
+        caption: ''
       },
       {
-        src: './images/catering.jpg',
+        src: 'https://cdn.pixabay.com/photo/2017/01/26/02/06/platter-2009590_1280.jpg',
         altText: 'Catering',
-        caption: 'Catering'
+        caption: ''
       },
       {
-        src: '../images/wellness.jpg',
+        src: 'https://cdn.pixabay.com/photo/2017/03/26/21/54/yoga-2176668_1280.jpg',
         altText: 'Wellness'
       }
+      //All images are from Pixabay.
     ];
     
     class CarouselBar extends Component {
@@ -86,6 +87,7 @@ import {
             {slides}
             <CarouselControl direction="prev" directionText="Previous" onClickHandler={this.previous} />
             <CarouselControl direction="next" directionText="Next" onClickHandler={this.next} />
+            <br/>
           </Carousel>
         );
       }
