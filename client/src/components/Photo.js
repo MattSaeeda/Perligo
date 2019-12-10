@@ -12,9 +12,9 @@ class Photo extends Component {
                         <p>Review: {post.review}</p>
                   </figcaption>
                   <div className="button-container">
-                  <Button className="button-group" outline color="primary">Upvote</Button>
-                  <Button className="button-group" outline color="primary">Downvote</Button>
-                  <Button className="button-group" outline color="primary">Comment</Button>
+                  <Button className="button-group" outline color="primary" onClick = {() => {this.props.upVote(post)}}>Upvote</Button>
+                  <Button className="button-group" outline color="primary" onClick = {() => {this.props.downVote(post)}}>Downvote</Button>
+                  <Button className="button-group" outline color="primary" onClick = {() => {this.props.addComment(post)}}>Comment</Button>
                   </div>
             </figure> 
       }

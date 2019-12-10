@@ -11,10 +11,12 @@ class Header extends Component {
                 
                 <h3>  &nbsp;An app to post reviews on any services and businesses and earn cryptocurrency</h3>
                 <Button outline color="primary">About</Button>{' '}
+                <Button outline color="primary">Post A Review</Button>{' '}
                 <Button outline color="primary">Add User</Button>{' '}
                 <Button outline color="primary">Remove User</Button>{' '}
-                {/* <Button outline color="primary">Sign in</Button>{' '}  */}
+                <Button outline color="primary">Sign in</Button>{' '} 
                 
+
                 <p> <br></br></p>
                 <Input placeholder="Search businesses or service providers" />
                 <InputGroup>
