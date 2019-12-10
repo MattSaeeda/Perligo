@@ -114,6 +114,12 @@ class Main extends Component {
 
     }
 
+    addPost(postSubmitted) {
+      this.setState(state => ({
+        posts: state.posts.concat([postSubmitted])
+      }))
+    }
+
 
   render() {
     // if (!this.state.web3) {
@@ -138,7 +144,11 @@ class Main extends Component {
        
             )}/>
 
-          <Route path = "/addPost" component = {AddPost}/>    
+          <Route path = "/addPost" render  = {({history}) =>  (<AddPost onAddPost = {(addedPost) => {
+            this.addPost(addedPost);
+            history.push('/');
+
+          }}/>)}/>
         
 
       </div>)
