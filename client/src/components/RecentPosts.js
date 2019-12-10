@@ -7,10 +7,13 @@ class RecentPosts extends Component {
 
       render() {
         return (
-            <div><h6>Click the plus sign below to add a review</h6>
+            <div><h6 >Click the plus sign below to add a review</h6>
             <Link  className = "add-icon"  to="/addPost"></Link>
             {/* <button onClick={this.props.onNavigate} className="add-icon"> </button> */}
                   <div className="photo-grid">
+                        {/* {this.props.posts.sort(function(x , y) {
+                              return y.id - x.id;
+                        })} */}
                   {/* <h4>Recent Reviews</h4> */}
                   {/* <Card >
                         <CardBody>

@@ -16,6 +16,12 @@ h4 {
       text-align: center;
       margin: 2rem auto;
 }
+h6 {
+      text-align: center;
+      margin: 2rem auto;
+      font-size: 14px;
+      color: blue;
+}
 
 @font-face {
       font-family: 'billabong';
@@ -46,7 +52,7 @@ h4 {
 
 .button-container {
       display: flex;
-      justify-content: center;
+      justify-content: center ;
 
 }
 

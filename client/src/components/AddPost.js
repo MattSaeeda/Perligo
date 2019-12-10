@@ -14,7 +14,7 @@ class AddPost extends Component {
             const bAddress = event.target.elements.address.value;
             const bReview = event.target.elements.review.value;
             const post = {
-                  id: 0,
+                  id: Number(new Date()),
                   name: bName,
                   address: bAddress,
                   review: bReview,

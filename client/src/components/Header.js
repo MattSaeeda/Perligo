@@ -14,15 +14,14 @@ class Header extends Component {
                 <Button outline color="primary">Post A Review</Button>{' '}
                 <Button outline color="primary">Add User</Button>{' '}
                 <Button outline color="primary">Remove User</Button>{' '}
-                <Button outline color="primary">Sign in</Button>{' '} 
+                <Button outline color="primary">Sign in</Button>{' '} <br/>
+                <br/>
+                <Input placeholder="Search businesses or service providers" /> <br/>
                 
-
-                <p> <br></br></p>
-                <Input placeholder="Search businesses or service providers" />
-                <InputGroup>
-                    <InputGroupAddon addonType="prepend"><Button>Sign in</Button></InputGroupAddon>
-                    <Input />
-                </InputGroup>
+                    
+                    <Button outline color="primary" ><Input />Sign in</Button>{' '} 
+                    
+                
             </div>
         );
     };
