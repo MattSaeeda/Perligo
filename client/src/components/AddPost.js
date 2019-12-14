@@ -23,8 +23,8 @@ class AddPost extends Component {
                   downVote: 0,
                   comment: "",
                   commentBody: ""
-
             }
+            
             if(imageLink && bName && bAddress && bReview) {
                   this.props.onAddPost(post);
             }
