@@ -133,7 +133,7 @@ class Main extends Component {
           
           <div>
                 <Header/><br></br>
-                <CarouselBar/>
+                <div className = "carousel" ><CarouselBar/></div>
                 <p> <br></br></p>
                 <RecentPosts posts={this.state.posts} upVote={this.upVote} downVote={this.downVote} addComment={this.addComment} />
                 {/* <PostAReview/> */}

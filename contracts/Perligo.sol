@@ -5,7 +5,7 @@ import "./Rewards.sol";
 contract Perligo is Rewards {
 
       
-      Rewards ourReward = new Rewards(1000000, 5600);
+      Rewards ourReward = new Rewards;
       
       address public owner;
 

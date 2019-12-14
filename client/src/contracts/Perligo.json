@@ -15734,7 +15734,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.5",
-  "updatedAt": "2019-12-06T22:23:38.634Z",
+  "updatedAt": "2019-12-12T02:10:36.727Z",
   "devdoc": {
     "methods": {
       "addMinters(address)": {
