@@ -39,8 +39,7 @@ class RecentPosts extends Component {
                         </CardBody>
                   </Card> */}
 
-                  {this.props.posts.map((post, index) => <Photo key={index} post={post} upVote = {this.props.upVote}
-                  downVote = {this.props.downVote} addComment = {this.props.addComment} />)}
+                  {this.props.posts.map((post, index) => <Photo key={index} post={post}/>)}
                   
 
                   </div>

@@ -1,5 +1,7 @@
 import Main from './Main';
-import{connect} from 'react-redux';
+import {connect} from 'react-redux';
+import {bindActionCreators} from "redux";
+import {upVote} from "../redux/actions";
 
 function mapStateToProps(state) {
       return {
@@ -7,6 +9,10 @@ function mapStateToProps(state) {
       };
 }
 
-const App = connect(mapStateToProps)(Main);
+function mapDispatchToProps(dispatch) {
+      return bindActionCreators({upVote}, dispatch);
+}
+
+const App = connect(mapStateToProps, mapDispatchToProps)(Main);
 
 export default App;
