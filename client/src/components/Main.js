@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import Footer from "./Footer.js";
 import Header from "./Header.js";
 import RecentPosts from "./RecentPosts";
-import PostAReview from "./PostAReview";
 import CarouselBar from "./CarouselBar";
 import Stats from "./Stats";
 import AddPost from "./AddPost";
@@ -66,31 +65,31 @@ class Main extends Component {
    this.props.upVote(1);
    }
 
-    upVote(postVoted) {
-      console.log(postVoted.name);
-      //this.setState({posts.upVote: postVoted.upVote + 1});
-      console.log(postVoted.upVote + 1);
-    }
+    // upVote(postVoted) {
+    //   console.log(postVoted.name);
+    //   //this.setState({posts.upVote: postVoted.upVote + 1});
+    //   console.log(postVoted.upVote + 1);
+    // }
 
-    downVote(postVoted) {
-      console.log(postVoted.name);
+    // downVote(postVoted) {
+    //   console.log(postVoted.name);
 
-    }
+    // }
 
-    addComment(postCommented) {
-      console.log(postCommented.name);
+    // addComment(postCommented) {
+    //   console.log(postCommented.name);
 
-    }
+    // }
 
-    addPost(postSubmitted) {
-      this.setState(state => ({
-        posts: state.posts.concat([postSubmitted])
-      }))
-    }
+    // addPost(postSubmitted) {
+    //   this.setState(state => ({
+    //     posts: state.posts.concat([postSubmitted])
+    //   }))
+    // }
 
 
   render() {
-    console.log(this.props.posts);
+    console.log(this.props);
     return (
       <div>
 
@@ -101,7 +100,7 @@ class Main extends Component {
                 <Header/><br></br>
                 <CarouselBar/>
                 <p> <br></br></p>
-                <RecentPosts posts={this.props.posts}/>
+                <RecentPosts posts={this.props.posts} {...this.props}/>
                 {/* <RecentPosts posts={this.state.posts} upVote={this.upVote} downVote={this.downVote} addComment={this.addComment} /> */}
                 {/* <PostAReview/> */}
                 <Stats/>

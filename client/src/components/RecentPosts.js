@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import { Button, Input,  Card, CardImg, CardText, CardBody,
-      CardTitle, CardSubtitle } from 'reactstrap';
+// import { Button, Input,  Card, CardImg, CardText, CardBody,
+//       CardTitle, CardSubtitle } from 'reactstrap';
 import Photo from "./Photo.js";
 import {Link} from 'react-router-dom'
-class RecentPosts extends Component {
+function RecentPosts(props) {
 
-      render() {
-        return (
-            <div><h6 >Click the plus sign below to add a review</h6>
+      
+        return <div><h6 >Click the plus sign below to add a review</h6>
             <Link  className = "add-icon"  to="/addPost"></Link>
             {/* <button onClick={this.props.onNavigate} className="add-icon"> </button> */}
                   <div className="photo-grid">
@@ -39,12 +38,12 @@ class RecentPosts extends Component {
                         </CardBody>
                   </Card> */}
 
-                  {this.props.posts.map((post, index) => <Photo key={index} post={post}/>)}
+                  {props.posts.map((post, index) => <Photo key={index} post={post} {...props} index={index}/>)}
                   
 
                   </div>
             </div>   
-        );
-    };
+        
+    
 };
 export default RecentPosts;

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { CardBody,Card, InputGroup, InputGroupAddon , Badge, Button, Input} from 'reactstrap';
+import { CardBody,Card, Badge} from 'reactstrap';
 
 class Stats extends Component {
 
