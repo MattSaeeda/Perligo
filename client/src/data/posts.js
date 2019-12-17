@@ -10,7 +10,7 @@ const posts = [{
             commentBody: ""
             },
             {
-            id: 1,
+            id: 0,
             name:"Milan Pizzeria",
             address:"2 Bay Street",
             review:"Best place to have a delicious pizza. I specifically loved their pepperony. Good prices too. You won't go wrong with this.",
@@ -30,6 +30,7 @@ const posts = [{
             downVote: 0,
             comment: "",
             commentBody: ""
-      }]
+      }
+];
 
       export default posts;

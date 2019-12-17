@@ -2,7 +2,9 @@ import React, { Component } from "react";
 import { Button} from 'reactstrap';
 
 class Photo extends Component {
+     // console.log(this.props.posts);
       render() {
+            console.log(this.props.posts);
             const post = this.props.post;
             return  <figure className="figure">
                   <img className = "photo" src={post.imageLink}/>
