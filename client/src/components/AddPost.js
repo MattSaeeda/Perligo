@@ -9,7 +9,7 @@ class AddPost extends Component {
 
       handleSubmit(event) {
             event.preventDefault();
-            const imageLink = event.target.elements.link.value;
+            const imageLink = event.target.elements.photo.value;
             const bName = event.target.elements.businessName.value;
             const bAddress = event.target.elements.address.value;
             const bReview = event.target.elements.review.value;
@@ -26,7 +26,8 @@ class AddPost extends Component {
 
             }
             if(imageLink && bName && bAddress && bReview) {
-                  this.props.onAddPost(post);
+                  this.props.addPost(post);
+                  this.props.onHistory.push('/')
             }
 
       }
@@ -34,10 +35,10 @@ class AddPost extends Component {
             
             return (
             <div> 
-                  <h1>Add A Reviews</h1>
+                  {/* <h1>Add A Reviews</h1> */}
                   <div className = "form">
                         <form onSubmit = {this.handleSubmit}>
-                              <input type = "text" placeholder="Link to the photo" name="link"/> 
+                              <input type = "text" placeholder="Link" name="photo"/> 
                               <input type = "text" placeholder="Name" name="businessName"/> 
                               <input type = "text" placeholder="Address" name="address"/> 
                               <input type = "text" placeholder="Your review" name="review"/> 

@@ -7,6 +7,8 @@ import Stats from "./Stats";
 import AddPost from "./AddPost";
 import {Route} from 'react-router-dom';
 import {upVote} from "../redux/actions";
+import {Link} from 'react-router-dom';
+import Single from "./Single";
 //import getWeb3 from "./getWeb3";
 
 //import "./App.css";
@@ -92,7 +94,9 @@ class Main extends Component {
     console.log(this.props);
     return (
       <div>
-
+          <h1>
+            <Link to='/'>Perligo</Link>
+          </h1>
           <Route exact path = "/" render={() => (
 
           
@@ -110,12 +114,11 @@ class Main extends Component {
        
             )}/>
 
-          {/* <Route path = "/addPost" render  = {({history}) =>  (<AddPost onAddPost = {(addedPost) => {
-            this.addPost(addedPost);
-            history.push('/');
-
-          }}/>)}/>
-         */}
+          <Route path = "/addPost" render  = {({history}) =>  (<AddPost {...this.props} onHistory={history}/>)}/>
+        
+            <Route path = "/single/:id" render = {(params) => (
+                <Single {...params}/>
+            )}/>
 
       </div>)
     

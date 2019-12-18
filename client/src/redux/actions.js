@@ -5,6 +5,13 @@ export function upVote(index) {
       }
 }
 
+export function addPost(post) {
+      return {
+            type: 'ADD_POST',
+            post: post
+      }
+}
+
 // function downVote(index) {
 //       return {
 //             type: "DOWNVOTE_POST",

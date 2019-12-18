@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Button} from 'reactstrap';
+import {Link} from 'react-router-dom';
 
 class Photo extends Component {
      // console.log(this.props.posts);
@@ -7,7 +8,8 @@ class Photo extends Component {
             console.log(this.props.posts);
             const post = this.props.post;
             return  <figure className="figure">
-                  <img className = "photo" src={post.imageLink} alt={post.name}/>
+                  <Link to={`/single/${post.id}`}> <img className = "photo" src={post.imageLink} alt={post.name}/></Link>
+                 
                   <figcaption>
                         <h4>{post.name}</h4>
                         <h5>Address: {post.address}</h5>
