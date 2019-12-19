@@ -1,8 +1,26 @@
-import posts from '../data/posts';
+import _posts from '../data/posts';
+import {combineReducers} from 'redux';
+
+function comments(state=[], action) {
+      
+      switch (action.type) {
+            case 'ADD_COMMENT':
+
+            if(!state[action.postId]) {
+                  return {...state, [action.postId]: [action.comment]}
+            } else{
+                  return {...state, [action.postId]: [...state[action.postId], action.comment]}
+            }
+                  
+            default:
+                  return state;
+      }
+      
+}
 
 
-const postReducer = function posts1(state = posts, action) {
-      //console.log(action.index)
+function posts(state = _posts, action) {
+      
       switch (action.type) {
             case 'upVote': return (action.upVote + 1);
             console.log(state.upVote)
@@ -12,4 +30,6 @@ const postReducer = function posts1(state = posts, action) {
       }
 }
 
-export default postReducer
+const rootReducer = combineReducers({posts, comments})
+
+export default rootReducer;
