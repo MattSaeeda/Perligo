@@ -19,7 +19,10 @@ function Photo(props) {
                   <Button className="button-group" outline color="primary" onClick = {() => {}}>Downvote</Button>
                   <Button className="button-group" outline color="primary" onClick = {() => {}}>Comment</Button>
                   <Link className="button" to={`/single/${post.id}`}>
-                        <div>
+                        <div className="comment-count">
+                              <div className="speech-bubble">
+
+                              </div>
                               {props.comments[post.id]  ?  props.comments[post.id].length : 0}
                               {console.log()}
                         </div>
