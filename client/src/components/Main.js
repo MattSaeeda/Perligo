@@ -91,7 +91,7 @@ class Main extends Component {
 
 
   render() {
-    console.log(this.props);
+   
     return (
       <div>
           <h1>
@@ -116,9 +116,7 @@ class Main extends Component {
 
           <Route path = "/addPost" render  = {({history}) =>  (<AddPost {...this.props} onHistory={history}/>)}/>
         
-            <Route path = "/single/:id" render = {(params) => (
-                <Single {...params}/>
-            )}/>
+            <Route path = "/single/:id" render = {(params) => (<Single {...this.props} {...params} />)}/>
 
       </div>)
     
