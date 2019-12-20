@@ -59,12 +59,10 @@ class Main extends Component {
   //   // Update state with the result.
   //   this.setState({ storageValue: response });
   // };
-  constructor() {
-    super()
- }
 
    componentDidMount() {
-   this.props.upVote(1);
+   //this.props.upVote(1);
+   this.props.startLoadingPost();
    }
 
     // upVote(postVoted) {

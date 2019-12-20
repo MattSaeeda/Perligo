@@ -23,11 +23,13 @@ function posts(state = _posts, action) {
       
       switch (action.type) {
             case 'upVote': return (action.upVote + 1);
-            console.log(state.upVote)
+            //console.log(state.upVote)
             case 'ADD_POST': return [...state, action.post];
-            default: return state;
+            case 'LOAD_POSTS': return action.posts;
+            default: return state
             
       }
+      
 }
 
 const rootReducer = combineReducers({posts, comments})
