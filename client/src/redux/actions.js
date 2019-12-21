@@ -1,3 +1,40 @@
+import {database} from '../database/config';
+import posts from '../data/posts';
+
+export function startAddingPost(post) {
+      return (dispatch) => {
+            return database.ref('posts').update({[post.id]: post}).then(() => {
+                  dispatch(addPost(post))
+            }).catch((error) => {
+                  console.log(error);
+            })
+      }
+}
+
+export function startLoadingPost() {
+      return(dispatch) => {
+            return database.ref('posts').once('value').then((snapshot) => {
+                  let posts = [];
+                  snapshot.forEach((childSnapshot) => {
+                        posts.push(childSnapshot.val())
+                  })
+                  dispatch(loadPosts(posts));
+            }).catch((error) => {
+                  console.log(error)
+                  })
+      }
+}
+
+export function startAddingComment(comment, postId) {
+      return (dispatch) => {
+            return database.ref('comments' + postId).push(comment).then(() => {
+                  dispatch(addComment(comment, postId))
+            }).catch((error) => {
+                  console.log(error)
+                  })
+      }
+}
+
 export function upVote(index) {
       return {
             type: "UPVOTE_POST",
@@ -8,7 +45,7 @@ export function upVote(index) {
 export function addPost(post) {
       return {
             type: 'ADD_POST',
-            post: post
+            post
       }
 }
 
@@ -19,6 +56,14 @@ export function addComment(comment, postId) {
             postId
 
       }
+}
+
+export function loadPosts(posts) {
+      return {
+            type: 'LOAD_POSTS',
+            posts
+      }
+
 }
 
 // function downVote(index) {

@@ -26,7 +26,7 @@ class AddPost extends Component {
 
             }
             if(imageLink && bName && bAddress && bReview) {
-                  this.props.addPost(post);
+                  this.props.startAddingPost(post);
                   this.props.onHistory.push('/')
             }
 
