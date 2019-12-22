@@ -63,6 +63,7 @@ class Main extends Component {
    componentDidMount() {
    //this.props.upVote(1);
    this.props.startLoadingPost();
+   this.props.startLoadingComments();
    }
 
     // upVote(postVoted) {
@@ -100,7 +101,7 @@ class Main extends Component {
           
           <div>
                 <Header/><br></br>
-                <CarouselBar/>
+                <CarouselBar className = "carousel"/>
                 <p> <br></br></p>
                 <RecentPosts posts={this.props.posts} {...this.props}/>
                 {/* <RecentPosts posts={this.state.posts} upVote={this.upVote} downVote={this.downVote} addComment={this.addComment} /> */}

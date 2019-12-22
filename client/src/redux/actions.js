@@ -27,13 +27,34 @@ export function startLoadingPost() {
 
 export function startAddingComment(comment, postId) {
       return (dispatch) => {
-            return database.ref('comments' + postId).push(comment).then(() => {
+            return database.ref('comments/' + postId).push(comment).then(() => {
                   dispatch(addComment(comment, postId))
             }).catch((error) => {
                   console.log(error)
                   })
       }
 }
+
+export function startLoadingComments() {
+      return (dispatch) => {
+            return database.ref('comments').once('value').then((snapshot) => {
+            let comments = {}
+            snapshot.forEach((childSnapshot) => {
+            comments[childSnapshot.key] = Object.values(childSnapshot.val())
+            })
+            dispatch(loadComments(comments))
+            }).catch((error) => {
+                  console.log(error)
+                  })
+      }
+}
+
+export function loadComments(comments) {
+      return {
+      type: 'LOAD_COMMENTS',
+      comments
+      }
+     }
 
 export function upVote(index) {
       return {
