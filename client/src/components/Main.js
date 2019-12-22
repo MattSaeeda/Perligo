@@ -9,6 +9,7 @@ import {Route} from 'react-router-dom';
 import {upVote} from "../redux/actions";
 import {Link} from 'react-router-dom';
 import Single from "./Single";
+import AboutModal from './AboutModal';
 //import getWeb3 from "./getWeb3";
 
 //import "./App.css";
@@ -95,6 +96,8 @@ class Main extends Component {
       <div>
           <h1>
             <Link to='/'>Perligo</Link>
+            
+
           </h1>
           <Route exact path = "/" render={() => (
 

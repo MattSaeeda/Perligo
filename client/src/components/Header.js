@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Button, Input, InputGroup, InputGroupAddon } from 'reactstrap';
+import { Button, Input, InputGroup, InputGroupAddon, ButtonGroup } from 'reactstrap';
+import AboutModal from './AboutModal';
 
 class Header extends Component {
     
@@ -7,14 +8,16 @@ class Header extends Component {
       render() {
         return (
             <div>
-                {/* <h2>PERLIGO</h2> */}
                 
                 <h3>  &nbsp;An app to post reviews on any services and businesses and earn cryptocurrency</h3>
-                <Button outline color="primary">About</Button>{' '}
-                <Button outline color="primary">Post A Review</Button>{' '}
-                <Button outline color="primary">Add User</Button>{' '}
-                <Button outline color="primary">Remove User</Button>{' '}
-                <Button outline color="primary">Sign in</Button>{' '} <br/>
+                <div>
+                <ButtonGroup>
+                <AboutModal/>&nbsp;
+                <Button outline color="primary">Add User</Button>{' '}&nbsp;
+                <Button outline color="primary">Remove User</Button>{' '}&nbsp;
+                 <br/>
+                </ButtonGroup>
+                </div>
                 <br/>
                 <Input placeholder="Search businesses or service providers" /> <br/>
                 
